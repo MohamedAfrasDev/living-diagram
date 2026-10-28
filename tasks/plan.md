@@ -1,106 +1,51 @@
-# Implementation Plan: LivingDiagrams (docs-first build)
+# Implementation Plan: LivingDiagrams
 
-Source: `docs/LivingDiagrams Documentation Plan.md` (Oct 27, 2026). Tasks are tracked in `tasks/todo.md`.
+Scope source: `AGENTS.md` ("Build ONLY") and `docs/01-product-one-pager.md`. Tasks are tracked in `tasks/todo.md`. Deadline: Nov 2 (stated by Afras); target submission Nov 1; official cutoff unconfirmed (D-002).
 
 ## Overview
 
-LivingDiagrams is a hackathon project: a student predicts how a system topology behaves, a deterministic TypeScript simulation engine runs it, and a Meta-model agent investigates failures through typed tools, with every numeric claim verified against recorded metrics. The source doc sets 12 short specs, written in dependency order, each leading its build work by about half a day. The repo is a fresh Create Next App scaffold (`app/`, `package.json`, no engine/agent code yet). Submission cutoff is 9 PM ET Nov 4; plan to submit the evening of Nov 4 Sri Lanka time.
+A fixed five-node system (Gateway, Order, Payment, Cache, DB) runs on a deterministic tick-based TypeScript simulator. One fault: Payment slowed 20x. A Muse Spark agent investigates through typed tools, may change four knobs (`timeoutMs`, `retries`, `circuitBreaker`, `bulkhead`), and every number it states is checked against recorded metrics. A Next.js canvas replays the engine's events. No hosting; judges use the video and run it locally from the README.
 
-## Architecture Decisions
+## Architecture decisions
 
-- **Docs lead code.** Each build phase starts only after its spec exists; golden tests are written by hand before the engine.
-- **Engine is isolated.** Plain TypeScript, no network, no model calls, never imports the agent package (e.g. `lib/engine/`). Deterministic, integer-ms time, fixed persisted arrival traces.
-- **Agent acts only through typed tools.** Unknown tool or argument is rejected. The model sees metric summaries and selected traces, never raw events.
-- **Claim checker gates output.** A numeric claim must match a recorded metric path or it is blocked.
-- **Server-only Meta key.** Calls go through Next.js route handlers.
-- **Unsupported = disabled, not approximated.** Retries, parallel calls, cycles return named errors and are disabled in the UI.
-- **Only work from Oct 26 counts.** The scaffold commit is boilerplate; no reuse of older code.
-- **Next.js caveat.** `AGENTS.md` warns this Next version has breaking changes: read `node_modules/next/dist/docs/` before writing any Next code (route handlers, app router).
-- **Decision log.** Dated append-only lines in `docs/decision-log.md`; if a spec is silent, add a question there instead of choosing.
+- Engine in `lib/engine/`: plain TypeScript, no network, no model calls, never imports the agent. Integer ms ticks, seeded generator only.
+- Agent in `lib/agent/`: typed tools; unknown tool or argument rejected; claim checker gates output.
+- Contracts in `lib/contracts/`: schemas shared by engine, agent and UI.
+- Meta key on the server only (route handler). Without a key the app runs in labeled Replay mode.
+- Next.js caveat: `AGENTS.md` says this version has breaking changes. Read `node_modules/next/dist/docs/` before writing route handlers or pages.
+- Only work from Oct 26, 2026 counts.
 
-## Dependency Graph
+## Dependency order
 
 ```
-1 One-pager ─┬─> 2 Rules + Day-1 spike ──> (image import go/no-go) ──> 10 UI spec
-             ├─> 4 Scenario pack ──> 5 Engine spec ──> 6 Golden tests ──> ENGINE CODE
-             └─> 3 AGENTS.md ──> repo scaffold / test runner
-5 + 4 ──> 7 Data contracts ──> 8 Agent spec ──> 9 Claim-check spec ──> AGENT + CHECKER CODE
-7 + 8 + 9 ──> 10 UI spec ──> UI CODE ──> 11 Eval/pilot plan ──> pilot ──> 12 Demo + README
+docs (01-07) -> spike (Meta tool calling) ----------------------------+
+              -> golden test (red) -> engine (green) -> tool layer -> claim checker -> agent loop -> golden run recorded
+                                                                                         |
+                                       canvas + panels (after engine green) <------------+
+                                                                       -> README, clean clone, tests, video -> submit
 ```
 
-## Task List
+## Phases
 
-### Phase 0: Foundations (Oct 28)
-- [x] T1: Product one-pager (doc 1)
-- [ ] T2: Rules review, decision log, Meta API spike (doc 2) — doc + protocol written; portal checks and 20 spike runs need Afras
-- [x] T3: AGENTS.md + repo scaffold with test runner (doc 3)
-- [x] T4: Scenario pack (doc 4)
-- [x] T5: Engine semantics spec (doc 5)
+- **Phase 0 (Oct 28):** docs written; Meta tool-call spike; failing golden test already in `lib/engine/simulate.test.ts`.
+- **Phase 1 (Oct 29):** engine green against the golden tests and invariants. No UI before this.
+- **Phase 2 (Oct 30):** typed tools, claim checker, agent loop, agent test, record one real golden run.
+- **Phase 3 (Oct 31):** canvas, metrics panel, agent timeline, Replay mode and label, `.env.example`, README draft.
+- **Phase 4 (Nov 1):** clean-clone test, 3 testers, video, submit. Nov 2 is buffer only.
 
-### Checkpoint: Specs frozen (end Oct 28)
-- [ ] Tool-call test scored 20 runs; image go/no-go logged; engine spec frozen; hello-world test passes in a fresh session
-
-### Phase 1: Engine (Oct 29)
-- [ ] T6: Golden test cases (doc 6), hand-computed first
-- [ ] T7: Data contracts (doc 7) + schema validation of scenario pack
-- [ ] T8: Agent spec (doc 8)
-- [ ] T9: Engine core: single node, serial chain (golden 1-2), TDD
-- [ ] T10: Engine: slots, queues, rejection (golden 3)
-- [ ] T11: Engine: faults and COMPONENT_DOWN, round-robin (golden 4)
-- [ ] T12: Engine: metrics + overload (golden 5), unsupported-feature errors
-
-### Checkpoint: Engine green (end Oct 29)
-- [ ] All golden tests pass; engine has no imports from agent/network
-
-### Phase 2: Agent (Oct 30)
-- [ ] T13: Evidence and claim-check spec (doc 9)
-- [ ] T14: UI spec (doc 10)
-- [ ] T15: Typed tool layer over engine (run, summarize, trace, compare)
-- [ ] T16: Claim checker (rejects fabricated number)
-- [ ] T17: Agent loop: Meta API route, state machine, budget, stop rules
-- [ ] T18: Outage investigation end-to-end (agent eval set seed)
-
-### Checkpoint: Agent works (end Oct 30)
-- [ ] Outage investigation completes with zero invented numbers; refusal cases (missing DB time, impossible budget, unsupported feature) pass
-
-### Phase 3: UI (Oct 31 - Nov 1)
-- [ ] T19: Evaluation and pilot plan (doc 11)
-- [ ] T20: Project home + model workspace (with prediction prompt)
-- [ ] T21: Investigation view with replay (replay labeled)
-- [ ] T22: Comparison view, failed-fix flow
-- [ ] T23: Overload scenario wired into demo path; start classmate pilot
-
-### Checkpoint: Both demo beats live (end Nov 1)
-- [ ] Outage and overload both run live; a fresh person finishes a first experiment unaided
-
-### Phase 4: Hardening and submission (Nov 2 - 4)
-- [ ] T24: Error/empty/loading states, provider-down fallback, evidence export; feature freeze
-- [ ] T25: Pilot results into doc 11; update docs 4 and 10 if needed
-- [ ] T26: README, setup check, architecture and Meta-usage statement, limits (doc 12)
-- [ ] T27: Record 3-minute video; public repo; verify clean-clone run
-- [ ] T28: Submit in portal (fix-only day)
-
-### Checkpoint: Submitted
-- [ ] Submitted hours before cutoff
-
-## Risks and Mitigations
+## Risks and mitigations
 
 | Risk | Impact | Mitigation |
-|------|--------|------------|
-| Muse Spark tool calling unreliable | High | Day-1 spike, 20 scored runs; fall back to constrained prompt + JSON validation, log decision |
-| Engine semantics wrong (everything downstream invalid) | High | Hand-computed golden tests before code; protect docs 5-9 time |
-| Image import unsupported | Med | Cut sketch import; decide and log Oct 28 |
-| Next.js version differs from training data | Med | Read bundled docs before route handlers/pages |
-| Deadline timezone ambiguity (1 hr) | Med | Submit evening Nov 4 Sri Lanka time |
-| Provider outage during demo | Med | Labeled replay fallback (T21, T24) |
-| Scope creep (retries, accounts, stochastic loads) | Med | Cut list is binding |
-| Rules ambiguity (judging weights, models, license) | Low | Portal checks in T2 |
+| --- | --- | --- |
+| Muse Spark tool calling unreliable or access blocked | High | Spike today; fallback is constrained JSON plus validation (D-009) |
+| The scenario does not produce the intended story | Resolved | D-014 to D-017: first template failed, one pre-registered change, then the bad-fix and good-fix definitions were changed on disk and disclosed. The honest finding is more load and slower tail, not a higher error rate |
+| D-003 or D-005 rejected after code is written | Med | Afras decides today, before engine work |
+| Agent test shows low success | Med | Report it honestly; apply the decision rule in doc 07 |
+| Judges lack a key | Med | Labeled Replay mode; golden run committed |
+| Deadline timezone unclear | Med | Submit Nov 1 |
+| Next.js version differs from training data | Med | Read bundled docs first |
+| Scope creep | Med | Won't list in doc 01 is binding |
 
-## Open Questions
+## Open questions
 
-- Final cutoff in local time and required video length
-- Judging weights (equal vs 30/25/25/20)
-- Which Meta models count; tool-calling support; credit limit
-- Repo license requirement and how "work done during the event" is verified
-- Who is named on the entry (solo)
-- Where engine/agent code lives (proposed `lib/engine`, `lib/agent`) - confirm in AGENTS.md (T3)
+See `docs/decision-log.md`: D-002, D-009, D-013, plus the proposed decisions D-003 to D-008, D-010, D-012.

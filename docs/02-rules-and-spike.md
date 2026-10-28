@@ -1,40 +1,37 @@
 # Rules, Deadline and Day-1 Spike
 
-Status: **incomplete.** The portal checks and the Meta API spike need your event portal login and API key, so I have not run them. Nothing below is marked done unless it was verified.
+Status: **incomplete.** The portal checks and the Meta API spike need Afras's event-portal login and API key. Nothing below is marked done unless it was verified.
 
-## 1. Portal checklist (answer from the event portal, record the date)
+## 1. Portal checklist (answer from the portal, record the date)
 
 | Item | Answer | Source / date |
 | --- | --- | --- |
-| Final cutoff in your time zone (plan assumes 9 PM ET Nov 4 = early Nov 5 Sri Lanka, sources differ by an hour) | _unconfirmed_ | |
-| Required video length (plan assumes 3 min) | _unconfirmed_ | |
-| Judging weights (equal vs 30/25/25/20) | _unconfirmed_ | |
-| Eligible Meta models (Muse Spark via Meta Model API only, or open-weights too) | _unconfirmed_ | |
+| Final cutoff, exact time and timezone (Afras says Nov 2; plan to submit Nov 1) | _unconfirmed_ | |
+| Video length limit (host said 3 minutes) | _unconfirmed in portal_ | host statement |
+| What counts as a working demo (host: runs from setup instructions plus video; hosting not required) | accepted | host statement |
+| Judging weights (earlier screenshots: Impact 30, Meta tooling 25, Execution 20, Demo 25) | _unconfirmed_ | |
+| Eligible Meta models; is Muse Spark via Meta Model API enough | _unconfirmed_ | |
+| Does the portal want an API key or credentials for judging | _unconfirmed_ | |
 | Repo license requirement; how "work done during the event" is checked | _unconfirmed_ | |
-| Tool calling supported on the chosen model | _see spike_ | |
+| Best Agentic Use-Case: is it a separate prize and how is it entered | _unconfirmed_ | |
 | Credit limit before charges | _unconfirmed_ | |
-| Who may be named on the entry (solo, one representative) | _unconfirmed_ | |
+| Who may be named on the entry (solo) | _unconfirmed_ | |
 
-## 2. Tool-calling spike protocol
+## 2. Tool-calling spike (do this first, today)
 
-Goal: decide if the agent can rely on native tool calling.
+Goal: decide whether the agent can rely on native tool calling through the Meta Model API. The exact model ID, endpoint and tool-call format come from the official Meta Model API docs; this repo does not guess them (D-009).
 
-- Model: the Meta model chosen from the checklist (Muse Spark per the plan).
-- Test prompt: given a 2-tool schema (`run_scenario(scenario_id)`, `get_metric(run_id, path)`), ask "Run the outage scenario and report its success rate."
-- Run it **20 times**. Script lives in scratch/`scripts/`, not in the product; the key is read from an env var, never committed.
-- Score each run (0/1 each): (a) valid tool name, (b) arguments match schema, (c) no invented tool, (d) final answer uses only returned numbers.
-- **Go** if at least 18/20 runs pass all four; otherwise **fallback**: constrained prompt plus JSON validation, log in `decision-log.md`.
+- Script lives outside the product (scratch folder). The key is read from an env var and never committed.
+- Prompt: given a 2-tool schema (`simulate(config)` and `get_metrics(run_id)`), ask "Run the baseline and report the error rate."
+- Run it **10 times** (cut from 20 because of the deadline). Score each run 0/1 on: (a) valid tool name, (b) arguments match schema, (c) no invented tool, (d) the final answer uses only returned numbers.
+- **Go** if at least 9 of 10 pass all four. Otherwise **fallback**: constrained JSON output plus validation; log it in `decision-log.md`.
 
 | Run | a | b | c | d |
 | --- | --- | --- | --- | --- |
-| 1-20 | _not run_ | | | |
+| 1-10 | _not run_ | | | |
 
-## 3. Image-input test
+## 3. Exit criteria
 
-Send one hand-drawn topology photo and ask for the nodes it contains. **Go** only if it lists all nodes correctly in 3 of 3 tries. Otherwise sketch import stays cut (D-001). Result: _not run_.
-
-## 4. Exit criteria for this doc
-
-- [ ] Checklist filled with sources
-- [ ] 20 runs scored
-- [ ] Image go/no-go logged in `decision-log.md`
+- [ ] Portal checklist filled with sources
+- [ ] 10 spike runs scored
+- [ ] Spike result and any fallback logged in `decision-log.md`

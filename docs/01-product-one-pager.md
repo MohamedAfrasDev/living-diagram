@@ -1,46 +1,66 @@
 # LivingDiagrams: Product One-Pager
 
-Oct 28, 2026 · @Afras · Status: draft, derived from `LivingDiagrams Documentation Plan.md`
+Oct 28, 2026 · @Afras · Status: draft for freeze · Track: Meta Global AI Hackathon, "Build for Your World", Indie Developer
 
-## Problem
+## One-liner
 
-Students draw system diagrams (API, database, replicas) but cannot see how the system behaves under failure or load. Their intuition about outages and overload is often wrong, and a static diagram never corrects it.
+LivingDiagrams is an agent that investigates why a backend design fails. It runs controlled experiments on a deterministic simulator, tries fixes (including wrong ones), and states only conclusions whose numbers match recorded metrics.
 
-## User
+## Problem (firsthand, write it in your own words)
 
-A student learning system design (first users: 5 to 10 classmates). Not a production engineer. Solo build, no accounts.
+"I added retries to make my service resilient, and I could not tell whether I had helped or caused a worse outage. A chatbot gave me a confident answer I could not verify."
 
-## What it does (30-second version)
+- Who: students and early-career backend developers who know the patterns (timeouts, retries, circuit breakers, bulkheads) but have never watched them fail.
+- Today's workaround: blog posts, chatbots, guessing. Real chaos tooling is too heavy.
+- Frequency is low and intensity is high, so this is a learning tool, not a daily tool.
 
-1. The student draws a small topology and **predicts** what happens under a fault or load spike.
-2. A deterministic simulator runs it: fixed arrival traces, exact numbers, same result every time.
-3. An AI agent (a Meta model, tool calling only) investigates the run, proposes fixes, compares runs, and reports a claim with the evidence run IDs.
-4. Every number the agent states is checked against recorded metrics. Unsupported numbers are blocked, not shown.
+## What it is
 
-## MVP scope
+A local Next.js app with one screen and one task: "Checkout is failing, payment is slow. Fix it."
 
-- Two scenarios: **database outage** and **overload** (see `04-scenario-pack.md`).
-- Four screens: project home, model workspace, investigation view with replay, comparison view.
-- Prediction prompt before every run.
-- Failed-fix flow: the student's first fix does not work, and the comparison shows why.
-- Evidence export.
+1. A fixed five-node system (Gateway, Order, Payment, Cache, DB) runs on a deterministic tick-based simulator.
+2. One fault: Payment is 20x slower.
+3. The Muse Spark agent investigates through typed tools only. It may change four knobs: `timeoutMs`, `retries`, `circuitBreaker`, `bulkhead`.
+4. The engine is the only source of numbers. A claim checker blocks any number that does not match a recorded metric path.
+5. The canvas replays the engine's event stream, so the animation is evidence and not decoration.
 
-## Not doing
+## Why it is agentic
 
-- Retries, queues and workers, deadlines, retry-storm scenario
-- Accounts, sharing, collaboration, server-side scoring
-- Diagram import from files, calibration against real measurements
-- Stochastic workloads (fixed persisted arrival traces only)
-- Sketch/image import (only if the Day-1 spike says go; see `decision-log.md`)
+- It chooses experiments from metrics; there is no fixed script.
+- It can be wrong (for example `retries=3`) and recovers from engine evidence.
+- It verifies its final fix on two seeds and on the no-fault baseline before concluding.
+- It has a budget and stop rules, and may answer "insufficient evidence".
+- It can act only through typed tools; unknown tools or arguments are rejected.
+
+## MVP scope (build only this)
+
+- Tick-based simulator in pure TypeScript. Same seed gives the same result.
+- Nodes: Gateway, Order, Payment, Cache, DB. Knobs: the four above. Fault: Payment slowed 20x.
+- Golden test first: baseline passes, fault fails (errorRate > 20%), bad fix (`retries=3`) is worse on downstream load and tail latency, good fix (`circuitBreaker` + `retries=0`) halves the error rate and reports its degraded share (D-017). No UI before it is green.
+- Next.js canvas animating the engine's events, a metrics panel and an agent activity log.
+- Agent via Meta Model API, tool calls only. Local state plus a recorded golden run (replay mode, labeled).
+
+## Not building
+
+Hosting or deployment, accounts, Supabase, SAM, voice, image or sketch import, diagram authoring, load balancers, replicas, outages, queues-to-workers, deadlines, stochastic workloads, comparison UI beyond two runs side by side, evidence export (cut first if behind).
+
+## How judges use it (no hosting required)
+
+The host confirmed a deployed backend is not needed. A working demo means it runs from the setup instructions plus the demo video.
+
+- Video: 3 minutes, real output, replay segments labeled.
+- Local run: `npm install`, optional `.env.local` with a Meta API key, `npm run dev`.
+- Without a key the app opens in Replay mode: the engine runs live, agent turns come from a recorded golden run and are labeled "Replay".
 
 ## Success
 
-- Demo: a 3-minute video showing the wrong prediction, the failed fix, the overload surprise and the classmate result.
-- Trust: no invented number in any agent output.
-- Impact: classmates predict system behavior better after using it (measured by `11-eval-pilot.md`, written before the test).
+- Golden test green, then the agent test (doc 07) measured and reported honestly, misses included.
+- Zero unsupported numbers reach the user.
+- Fresh clone runs from the README alone.
+- At least 2 of 3 testers explain why `retries=3` did not help (small sample, disclosed).
 
 ## Hard constraints
 
-- Only work built from Oct 26, 2026 counts for the event.
-- Submit evening of Nov 4 (Sri Lanka time); official cutoff 9 PM ET Nov 4, unconfirmed.
-- Meta API key stays on the server.
+- Deadline: Nov 2 (stated by Afras). Official cutoff time and timezone unconfirmed; plan to submit Nov 1.
+- Only work built from Oct 26, 2026 counts; no reuse of older code.
+- The Meta API key stays on the server (env var, never committed).
