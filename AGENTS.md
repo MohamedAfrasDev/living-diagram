@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # LivingDiagrams: project rules
 
-Specs live in `docs/` (numbered 01-12); the plan is `tasks/plan.md`, tasks are `tasks/todo.md`, decisions are `docs/decision-log.md`.
+Specs live in `docs/` (numbered 01-07); the plan is `tasks/plan.md`, tasks are `tasks/todo.md`, decisions are `docs/decision-log.md`.
 
 ## Layout
 
@@ -44,3 +44,14 @@ Specs live in `docs/` (numbered 01-12); the plan is `tasks/plan.md`, tasks are `
 - No randomness or wall-clock time in the engine; time is integer milliseconds.
 - No reuse of code written before Oct 26, 2026 (event rule).
 - No `any` to silence type errors in engine or contracts.
+
+Build ONLY:
+
+1. Tick-based (not discrete-event) simulator in pure TS. Same seed = same result.
+   Nodes: Gateway, Order, Payment, Cache, DB.
+   Knobs only: timeoutMs, retries, circuitBreaker, bulkhead.
+   Fault only: slow payment by 20x.
+   Test first: Write a test that baseline passes, fault fails errorRate > 20%, bad fix (retries=3) fails worse, good fix (circuitBreaker+retries=0) passes. Do not build UI until this test is green.
+2. Then: Next.js canvas animating that simulator.
+3. Then: Muse Spark agent that outputs ONLY JSON patches using those 4 knobs via tool calls to simulate().
+   No Supabase yet. No SAM. No voice. Use local state + golden run JSON.
