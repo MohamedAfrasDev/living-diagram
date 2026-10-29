@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { investigate, type TranscriptEntry } from "./loop";
+import { SYSTEM_PROMPT } from "./prompt";
 import { MetaProvider, ProviderError, type InputItem, type ModelTurn, type Provider, type ProviderRequest } from "./provider";
 import { ToolSession } from "./tools";
 
@@ -144,6 +145,14 @@ describe("investigation loop", () => {
     const out = await investigate({ question: "q", provider, signal: controller.signal });
     expect(out.status).toBe("cancelled");
     expect(provider.requests.length).toBe(1);
+  });
+});
+
+describe("system prompt", () => {
+  test("defines the default baseline and does not name the fix", () => {
+    expect(SYSTEM_PROMPT).toContain("timeoutMs 1000, retries 0, circuitBreaker false, bulkhead null");
+    // The prompt documents knobs; it must not tell the agent which one to use.
+    expect(SYSTEM_PROMPT).not.toMatch(/(use|enable|turn on|recommend)[^.]{0,40}circuit ?breaker/i);
   });
 });
 

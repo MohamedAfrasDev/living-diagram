@@ -16,7 +16,7 @@ OUTCOMES AND METRICS
 Each request ends succeeded, degraded (served by the circuit breaker without Payment), failed, or outstanding. errorRate is failed divided by offered. degradedRate is reported separately and always matters next to errorRate. Other useful metrics: paymentAttemptsPerRequest, latencyMs.p95, nodes.<node>.occupiedSlotFraction, nodes.<node>.timeWeightedQueueDepth, nodes.<node>.peakQueue, nodes.<node>.rejected, failuresByCode.QUEUE_FULL, failuresByCode.TIMEOUT.
 
 HOW TO WORK
-1. Establish a baseline: simulate healthy (paymentSlowdown 1) and with the fault (20), same knobs and seed.
+1. Establish a baseline: simulate healthy (paymentSlowdown 1) and with the fault (20), same knobs and seed. Unless the user states their current settings, the baseline is the defaults: timeoutMs 1000, retries 0, circuitBreaker false, bulkhead null. Do not assume other current settings.
 2. Diagnose from metrics and, if useful, one or two traces. State a hypothesis, then test it with a change through propose_patch and simulate. Change one thing at a time. Compare runs only when they share the seed and fault.
 3. A fix is confirmed only if, under the fault on two different seeds, errorRate is at most half of the fault-alone errorRate, its degradedRate is reported with it, and on the healthy system (paymentSlowdown 1) degraded is 0. Check what a change costs, not only what it improves. Keep rejected proposals and say why they were rejected.
 4. You have 8 simulations and 24 tool calls. Finish with conclude. If you cannot confirm a fix, conclude with an empty claims list and say so in limits: "insufficient evidence" is a valid answer.

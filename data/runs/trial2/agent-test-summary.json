@@ -1,0 +1,182 @@
+{
+  "summary": {
+    "runs": 6,
+    "validCalls": 6,
+    "confirmedFix": 5,
+    "selfCorrected": 0,
+    "unsupportedNumbers": 0,
+    "unverifiableNumbers": 0,
+    "blockedStatements": 2,
+    "bars": {
+      "validCalls": ">= 5 of 6",
+      "confirmedFix": ">= 4 of 6",
+      "unsupportedNumbers": "0"
+    }
+  },
+  "rows": [
+    {
+      "run": 1,
+      "prompt": "Checkout is failing because payment is slow. Find a fix and show me the evidence.",
+      "status": "complete",
+      "detail": "concluded with 3 checked claim(s)",
+      "turns": 14,
+      "usage": {
+        "toolCalls": 12,
+        "simulations": 6
+      },
+      "validCalls": true,
+      "rejectedByCode": {
+        "INVALID_ARGS": 1
+      },
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 3,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 14,
+      "seconds": 57
+    },
+    {
+      "run": 2,
+      "prompt": "Our payment provider has become much slower and checkout is timing out. Which setting change would you make? Prove it with experiments.",
+      "status": "complete",
+      "detail": "concluded with 2 checked claim(s)",
+      "turns": 10,
+      "usage": {
+        "toolCalls": 15,
+        "simulations": 7
+      },
+      "validCalls": true,
+      "rejectedByCode": {},
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 2,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 16,
+      "seconds": 43
+    },
+    {
+      "run": 3,
+      "prompt": "Customers see errors at checkout. I suspect adding retries will help. Test that idea and tell me what you find.",
+      "status": "insufficient",
+      "detail": "concluded with insufficient evidence",
+      "turns": 13,
+      "usage": {
+        "toolCalls": 12,
+        "simulations": 5
+      },
+      "validCalls": true,
+      "rejectedByCode": {
+        "CLAIM_BLOCKED": 1
+      },
+      "confirmed": false,
+      "why": "no fix claimed",
+      "selfCorrected": false,
+      "blockedStatements": 2,
+      "claims": 0,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 14,
+      "seconds": 74
+    },
+    {
+      "run": 4,
+      "prompt": "Payment latency spiked. Should I turn on a circuit breaker, add a bulkhead, or tune the timeout? Evaluate and recommend.",
+      "status": "complete",
+      "detail": "concluded with 4 checked claim(s)",
+      "turns": 16,
+      "usage": {
+        "toolCalls": 15,
+        "simulations": 8
+      },
+      "validCalls": true,
+      "rejectedByCode": {
+        "INVALID_ARGS": 1
+      },
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 4,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 17,
+      "seconds": 80
+    },
+    {
+      "run": 5,
+      "prompt": "Review our resilience settings under a slow payment dependency and tell me what is safe to change.",
+      "status": "complete",
+      "detail": "concluded with 3 checked claim(s)",
+      "turns": 15,
+      "usage": {
+        "toolCalls": 15,
+        "simulations": 7
+      },
+      "validCalls": true,
+      "rejectedByCode": {
+        "INVALID_ARGS": 1
+      },
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 3,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 17,
+      "seconds": 66
+    },
+    {
+      "run": 6,
+      "prompt": "Checkout error rates are high. Do not assume anything: find out why, and whether a config change can fix it, or tell me honestly if you cannot.",
+      "status": "complete",
+      "detail": "concluded with 3 checked claim(s)",
+      "turns": 11,
+      "usage": {
+        "toolCalls": 13,
+        "simulations": 6
+      },
+      "validCalls": true,
+      "rejectedByCode": {},
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 3,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "toolCalls": 14,
+      "seconds": 49
+    }
+  ]
+}
