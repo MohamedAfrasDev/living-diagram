@@ -43,6 +43,18 @@ export interface SimulateInput {
   knobs: Knobs;
   paymentSlowdown: number;
   recordEvents?: boolean;
+  // Sample node occupancy every TIMELINE_STEP_MS for the canvas. Display only:
+  // it is not part of the run hash and is never returned by an agent tool.
+  recordTimeline?: boolean;
+}
+
+export const TIMELINE_STEP_MS = 50;
+
+export interface TimelineSample {
+  t: number;
+  nodes: Record<NodeId, { busy: number; queue: number }>;
+  outcomes: { succeeded: number; degraded: number; failed: number };
+  breaker: "closed" | "open" | "half-open";
 }
 
 export type EventType =
@@ -91,6 +103,7 @@ export interface SimulationResult {
   nodes: Record<NodeId, NodeMetrics>;
   runHash: string;
   events?: EngineEvent[];
+  timeline?: TimelineSample[];
 }
 
 interface Request {
@@ -188,6 +201,7 @@ export function simulate(input: SimulateInput): SimulationResult {
   const horizon = HORIZON_MS;
   const rng = mulberry32(seed);
   const events: EngineEvent[] | null = input.recordEvents ? [] : null;
+  const timeline: TimelineSample[] | null = input.recordTimeline ? [] : null;
 
   let t = 0;
   let eventCount = 0;
@@ -460,6 +474,20 @@ export function simulate(input: SimulateInput): SimulationResult {
         ns[id].queueMs += ns[id].queue.length;
       }
     }
+    if (timeline && t % TIMELINE_STEP_MS === 0) {
+      timeline.push({
+        t,
+        nodes: {
+          gateway: { busy: ns.gateway.busy, queue: ns.gateway.queue.length },
+          order: { busy: ns.order.busy, queue: ns.order.queue.length },
+          cache: { busy: ns.cache.busy, queue: ns.cache.queue.length },
+          payment: { busy: ns.payment.busy, queue: ns.payment.queue.length },
+          db: { busy: ns.db.busy, queue: ns.db.queue.length },
+        },
+        outcomes: { succeeded, degraded, failed },
+        breaker: breaker.state,
+      });
+    }
     if (eventCount > MAX_EVENTS) {
       incomplete = true;
       break;
@@ -506,5 +534,6 @@ export function simulate(input: SimulateInput): SimulationResult {
   };
   const result: SimulationResult = { ...body, runHash: fnv1a(JSON.stringify({ seed, knobs, paymentSlowdown, body })) };
   if (events) result.events = events;
+  if (timeline) result.timeline = timeline;
   return result;
 }
