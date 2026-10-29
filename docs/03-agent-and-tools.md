@@ -37,7 +37,7 @@ The agent is Muse Spark (`muse-spark-1.3`) through the Meta Model API Responses 
 
 ## 4. Budget and stop rules
 
-- Max 8 `simulate` calls and 24 tool calls per investigation. Increasing either needs an explicit user action.
+- Max 8 `simulate` calls and 24 tool calls per investigation (rejected calls count). `conclude` is exempt from the 24 so a model that used every call can still finish, but it is capped at 4 attempts (D-025). When the tool or simulation budget is used, the loop tells the model to call `conclude` once. Increasing a budget needs an explicit user action.
 - Stop when the question is answered within scope, the budget is used, a run fails repeatedly, the provider is unavailable, or the user cancels.
 - "Insufficient evidence" is a valid final answer and must say what is missing.
 
@@ -67,3 +67,10 @@ A statement (claim or rejected proposal) is `{ text, numbers, comparison }`. Imp
 - Provider timeout or error: bounded retry for transport errors, then a visible "Agent unavailable" state. Manual simulation stays usable.
 - Invalid tool call from the model: rejected with a machine-readable code, returned to the model once, counted against the budget.
 - Missing API key: Replay mode, labeled.
+
+## 8. Implementation notes (T12)
+
+- `lib/agent/loop.ts`: `investigate()` keeps the full ordered history itself and sends it each turn (D-024). It records a transcript (user, assistant text, tool call, tool result, nudge, status) and calls `onEntry` for each entry, which the route streams. Statuses: `complete`, `insufficient`, `budget_exceeded` (turn limit, 24), `provider_unavailable`, `invalid_output` (two text-only turns), `cancelled`.
+- `lib/agent/provider.ts`: `MetaProvider` posts to `https://api.meta.ai/v1/responses` with model `muse-spark-1.3`, `tool_choice: "auto"`, no `previous_response_id`. 429, 5xx and network errors are retried up to 3 times with 500 ms, 1 s, 2 s backoff; other 4xx are not. Errors never contain the key.
+- `lib/agent/prompt.ts`: documents the system, knobs, metrics, confirmation rule and `conclude` rules. It does not say which fix works.
+- `app/api/agent/route.ts`: `POST {question}` streams NDJSON lines `{kind:"entry", entry}` and a final `{kind:"outcome", status, detail, turns, usage, conclusion, blocked}`. One investigation at a time (429 BUSY). Without `MODEL_API_KEY` it returns 503 `NO_API_KEY` so the UI switches to Replay mode. The hosted replay-only build must not set the key (D-020).

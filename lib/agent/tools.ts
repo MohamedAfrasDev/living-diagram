@@ -24,6 +24,7 @@ import { flattenMetrics, HEADLINE_PATHS, type MetricValue } from "./metrics";
 
 export const MAX_SIMULATIONS = 8;
 export const MAX_TOOL_CALLS = 24;
+export const MAX_CONCLUDE_ATTEMPTS = 4;
 const MAX_TRACE_EVENTS = 60;
 
 export interface StoredRun {
@@ -61,8 +62,9 @@ export class ToolSession implements Evidence {
   private readonly runs = new Map<string, StoredRun>();
   private toolCalls = 0;
   private simulations = 0;
-  private readonly maxSimulations: number;
-  private readonly maxToolCalls: number;
+  readonly maxSimulations: number;
+  readonly maxToolCalls: number;
+  private concludeAttempts = 0;
 
   constructor(options: ToolSessionOptions = {}) {
     this.maxSimulations = options.maxSimulations ?? MAX_SIMULATIONS;
@@ -89,6 +91,15 @@ export class ToolSession implements Evidence {
   }
 
   private dispatch(name: string, args: unknown): ToolResult<unknown> {
+    // conclude is exempt from the tool budget so a model that used every call can
+    // still finish, but it is capped so blocked conclusions cannot loop forever.
+    if (name === "conclude") {
+      if (this.concludeAttempts >= MAX_CONCLUDE_ATTEMPTS) {
+        return err("BUDGET_EXCEEDED", `conclude was attempted ${MAX_CONCLUDE_ATTEMPTS} times`);
+      }
+      this.concludeAttempts++;
+      return this.concludeTool(args);
+    }
     // Rejected calls count too, so a looping model cannot burn unbounded calls.
     if (this.toolCalls >= this.maxToolCalls) {
       return err("BUDGET_EXCEEDED", `tool call budget of ${this.maxToolCalls} is used`);

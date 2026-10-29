@@ -19,6 +19,8 @@ The five golden tests in doc 05 plus invariants pass. Result: _not run_.
 | --- | --- | --- | --- | --- | --- |
 | 1-6 | _not run_ | | | | |
 
+Exploratory run before the formal test (2026-10-29, live through `/api/agent`, not counted in the six): status `complete`, 14 turns, 7 simulations, 18 tool calls. The agent ran healthy and fault baselines, tried `circuitBreaker` first, verified it on a second seed and on the healthy system, then tested `retries=2` as a counterexample and rejected it with recorded numbers (errorRate close to the fault alone, about 3 attempts per request, slower tail). Its first `conclude` was blocked by the checker ("two" written as a word in a limit) and it fixed it on the next call. Every number in the three accepted claims matched a recorded metric. It did **not** try a wrong fix first, so the "self-corrects" column may stay empty; the video must show what the agent really does. Log saved as `data/golden/candidate-live-run-1.ndjson`.
+
 Decision rule: if confirmed fixes are fewer than 3 of 6 while the engine is solid, reposition the agent as an optional explainer over a manual experiment lab (log in `decision-log.md`). The retry result is what the engine shows (D-016, D-017): more load and slower tail, not a higher error rate. Do not fake a different story.
 
 ## 3. Claim checker tests

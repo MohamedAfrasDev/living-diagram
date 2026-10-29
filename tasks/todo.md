@@ -24,7 +24,7 @@ Checkpoint: engine tests green (33 of 33); engine has no agent or network import
 
 - [x] T10: Typed tool layer over the engine (`simulate`, `get_metrics`, `get_trace`, `propose_patch`, `compare`) in `lib/agent/tools.ts`; unknown tool or argument rejected; budgets enforced. `conclude` arrives with T11
 - [x] T11: Claim checker and `conclude` tool (`lib/agent/claims.ts`, 22 tests): fabricated, rounding, unlisted-token, knob, seed, ratio, difference, number-word, causal and direction cases
-- [ ] T12: Agent loop and Meta route handler (read Next docs first): state machine, budget, stop rules, key server-side only
+- [x] T12: Agent loop (`lib/agent/loop.ts`), Meta provider (`provider.ts`), system prompt (`prompt.ts`), route `app/api/agent/route.ts` (NDJSON stream, key server-side, 503 NO_API_KEY without a key). 15 new tests with a scripted provider. One live run completed (see doc 07, exploratory)
 - [ ] T13: Agent test, 6 runs, results recorded honestly (doc 07)
 - [ ] T14: Record one real golden agent session to `data/golden/`
 
