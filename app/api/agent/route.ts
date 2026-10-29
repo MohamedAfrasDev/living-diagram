@@ -1,8 +1,10 @@
 // Server-only route that runs one investigation and streams it as NDJSON
 // (one JSON object per line). The Meta API key is read here from the
 // environment (rule 7) and never reaches the browser. Without a key the route
-// answers 503 NO_API_KEY so the UI can switch to labeled Replay mode.
+// answers 503 NO_API_KEY so the UI can switch to labeled Replay mode. With
+// REPLAY_ONLY=1 it answers 503 REPLAY_ONLY before looking at anything else.
 import { investigate, type TranscriptEntry } from "../../../lib/agent/loop";
+import { LIVE_AGENT_OFF_REASON, isReplayOnly } from "../../../lib/hosting";
 import { MetaProvider } from "../../../lib/agent/provider";
 import { ToolSession } from "../../../lib/agent/tools";
 
@@ -15,6 +17,8 @@ const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 export async function POST(request: Request) {
+  // A hosted replay copy refuses every request, even if a key is present.
+  if (isReplayOnly(process.env.REPLAY_ONLY)) return json({ code: "REPLAY_ONLY", message: LIVE_AGENT_OFF_REASON }, 503);
   const apiKey = process.env.MODEL_API_KEY;
   if (!apiKey) return json({ code: "NO_API_KEY", message: "the agent is unavailable; use Replay mode" }, 503);
 

@@ -202,6 +202,7 @@ export function Timeline({
   onShowAll,
   onSelectRun,
   badge,
+  liveDisabledReason,
 }: {
   entries: TranscriptEntry[];
   outcome: OutcomeView | null;
@@ -217,6 +218,7 @@ export function Timeline({
   onShowAll: () => void;
   onSelectRun: (id: string) => void;
   badge: ReactNode;
+  liveDisabledReason: string | null;
 }) {
   const callArgs = new Map<string, Json>();
   for (const e of entries) if (e.kind === "tool_call") callArgs.set(e.callId, asJson(e.args));
@@ -240,14 +242,14 @@ export function Timeline({
           onChange={(e) => onQuestion(e.target.value)}
           rows={2}
           maxLength={500}
-          disabled={running}
+          disabled={running || liveDisabledReason !== null}
           className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm disabled:opacity-60"
         />
         <div className="flex flex-wrap gap-2">
           {running ? (
             <Button onClick={onCancel}>Cancel</Button>
           ) : (
-            <Button type="submit" kind="primary" disabled={question.trim().length === 0}>
+            <Button type="submit" kind="primary" disabled={question.trim().length === 0 || liveDisabledReason !== null} describedBy={liveDisabledReason ? "live-off-reason" : undefined}>
               Ask the agent
             </Button>
           )}
@@ -257,6 +259,11 @@ export function Timeline({
           {replaying ? <Button onClick={onShowAll}>Show all</Button> : null}
         </div>
       </form>
+      {liveDisabledReason ? (
+        <p id="live-off-reason" className="mt-2 rounded-md border border-warn/40 bg-warn/5 px-3 py-2 text-xs text-warn">
+          {liveDisabledReason}
+        </p>
+      ) : null}
 
       <div aria-live="polite" className="mt-3 min-h-5 text-xs">
         {notice}

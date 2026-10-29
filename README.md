@@ -40,7 +40,7 @@ cp .env.example .env.local
 # edit .env.local and set MODEL_API_KEY=<your Meta Model API key>
 ```
 
-The key is read only by the server route and never reaches the browser. Other commands: `npm test` (113 tests), `npm run build`, `npm run lint`.
+The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (113 tests), `npm run build`, `npm run lint`.
 
 ## What you will see
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import type { InvestigationStatus, TranscriptEntry } from "@/lib/agent/loop";
 import { verifyGolden, type VerifyResult } from "@/lib/agent/replay";
 import { HORIZON_MS } from "@/lib/engine/scenario";
+import { isReplayOnly, liveAgentDisabledReason } from "@/lib/hosting";
 import { simulate, type Knobs, type SimulationResult } from "@/lib/engine/simulate";
 import { DEFAULT_KNOBS, extractRuns, runInput, sampleAt, type UiRun } from "@/lib/ui/runs";
 import { Canvas, NodeTable } from "./Canvas";
@@ -19,6 +20,8 @@ const DEFAULT_QUESTION = "Checkout is failing because payment is slow. Find a fi
 // recording and (correctly) fails verification. fetch + JSON.parse is exact.
 const GOLDEN_URL = "/golden/slow-payment-run-1.json";
 const REPLAY_STEP_MS = 450;
+// Inlined at build time. On a hosted copy the live agent is off and says why.
+const LIVE_DISABLED_REASON = liveAgentDisabledReason(isReplayOnly(process.env.NEXT_PUBLIC_REPLAY_ONLY));
 const VIRTUAL_MS_PER_SECOND = 3000;
 
 // Pure and deterministic, so results are cached by their inputs.
@@ -176,7 +179,7 @@ export function Workspace() {
 
   const ask = async () => {
     const q = question.trim();
-    if (!q || running) return;
+    if (!q || running || LIVE_DISABLED_REASON) return;
     const controller = new AbortController();
     abortRef.current = controller;
     setRunning(true);
@@ -285,6 +288,7 @@ export function Workspace() {
               Replay verified against the live engine · {verification.replayedCalls} calls re-run
             </Badge>
           ) : null}
+          {LIVE_DISABLED_REASON ? <Badge tone="replay" title={LIVE_DISABLED_REASON}>Hosted replay copy</Badge> : null}
           <Badge title="Virtual time and template parameters">Template model</Badge>
         </div>
       </header>
@@ -341,6 +345,7 @@ export function Workspace() {
           onShowAll={showAll}
           onSelectRun={selectRun}
           badge={badge}
+          liveDisabledReason={LIVE_DISABLED_REASON}
         />
 
         <div className="xl:sticky xl:top-4">

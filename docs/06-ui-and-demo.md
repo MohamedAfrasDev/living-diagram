@@ -70,7 +70,7 @@ Built in `app/_components/` (`Workspace`, `Canvas`, `Playback`, `Timeline`, `Evi
 4. No other secret, database or storage exists. The only server code is the route; the static page and `public/golden/` carry everything else.
 
 **Steps (each outward-facing step needs Afras's go)**
-1. Code and tests for 2 and 3 above; commit. (local, reversible)
+1. Code and tests for 2 and 3 above; commit. (local, reversible) **Done 2026-10-29:** `lib/hosting.ts`, the route guard, the disabled button with a visible reason and a "Hosted replay copy" badge; 6 new tests (119 total). Checked on a production build with both flags on while the real key was loaded from `.env.local`: `POST /api/agent` returned 503 `REPLAY_ONLY` for normal and malformed bodies, the key was absent from the response and the page HTML, the live button and textarea were disabled with the reason, and the Replay still verified. Normal mode (no flags) is unchanged.
 2. Push the 7 local commits and merge them into `main` on the public repo (PR from `engine-and-docs`). Today `origin/main` holds only the first commit's engine; the hosted build and the judges should see the same code. (public)
 3. Create the Vercel project under account `mohamedafrasdev` (CLI is signed in; GitHub import or `vercel`), framework Next.js, env `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` set **before** the first build, no other variables. (public)
 4. Confirm the production URL is reachable logged out (Vercel deployment protection can require a login for some URLs).

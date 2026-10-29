@@ -42,6 +42,7 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 - [ ] T19: Clean-clone run from README only. Done without a key (2026-10-29); still to do with a key, and again after the final commit
 - [ ] T20: 3-tester check (doc 07)
 - [ ] T21: 3-minute video from real output, replay segments labeled
+- [x] T22a: Hosted replay-only guard built and tested (D-032 step 1). [ ] T22b: push to the public `main` and deploy, waiting for Afras's go
 - [ ] T22: Secrets check, repo public, X post (optional), submission text, submit before Nov 4, 9 PM ET; open it as a judge would
 
 Cut order if behind: evidence export, second scenario, extra testers, panel polish. Never cut the golden test, claim checker, a live engine run, or the Replay label.

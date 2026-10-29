@@ -39,6 +39,7 @@ export function Button({
   kind = "secondary",
   type = "button",
   label,
+  describedBy,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -46,11 +47,12 @@ export function Button({
   kind?: "primary" | "secondary";
   type?: "button" | "submit";
   label?: string;
+  describedBy?: string;
 }) {
   const base = "inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
   const style = kind === "primary" ? "bg-accent text-background hover:opacity-90" : "border border-border bg-surface hover:bg-surface-2";
   return (
-    <button type={type} onClick={onClick} disabled={disabled} aria-label={label} className={`${base} ${style}`}>
+    <button type={type} onClick={onClick} disabled={disabled} aria-label={label} aria-describedby={describedBy} className={`${base} ${style}`}>
       {children}
     </button>
   );
