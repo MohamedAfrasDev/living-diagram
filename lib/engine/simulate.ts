@@ -43,6 +43,18 @@ export interface SimulateInput {
   knobs: Knobs;
   paymentSlowdown: number;
   recordEvents?: boolean;
+  // Sample node occupancy every TIMELINE_STEP_MS for the canvas. Display only:
+  // it is not part of the run hash and is never returned by an agent tool.
+  recordTimeline?: boolean;
+}
+
+export const TIMELINE_STEP_MS = 50;
+
+export interface TimelineSample {
+  t: number;
+  nodes: Record<NodeId, { busy: number; queue: number }>;
+  outcomes: { succeeded: number; degraded: number; failed: number };
+  breaker: "closed" | "open" | "half-open";
 }
 
 export type EventType =
@@ -91,6 +103,7 @@ export interface SimulationResult {
   nodes: Record<NodeId, NodeMetrics>;
   runHash: string;
   events?: EngineEvent[];
+  timeline?: TimelineSample[];
 }
 
 interface Request {
@@ -137,26 +150,31 @@ function isInt(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value);
 }
 
-function validate(input: SimulateInput): void {
-  const { knobs, paymentSlowdown, seed } = input;
-  const bad = (message: string): never => {
-    throw new EngineError("INVALID_KNOBS", message);
-  };
-  if (!isInt(seed)) bad("seed must be an integer");
+// Returns a message when the knobs are outside the documented domain
+// (docs/04-scenario-pack.md), or null when valid.
+export function knobsError(knobs: Knobs): string | null {
   const d = KNOB_DOMAIN;
   if (!isInt(knobs.timeoutMs) || knobs.timeoutMs < d.timeoutMs.min || knobs.timeoutMs > d.timeoutMs.max) {
-    bad(`timeoutMs must be an integer in ${d.timeoutMs.min}..${d.timeoutMs.max}`);
+    return `timeoutMs must be an integer in ${d.timeoutMs.min}..${d.timeoutMs.max}`;
   }
   if (!isInt(knobs.retries) || knobs.retries < d.retries.min || knobs.retries > d.retries.max) {
-    bad(`retries must be an integer in ${d.retries.min}..${d.retries.max}`);
+    return `retries must be an integer in ${d.retries.min}..${d.retries.max}`;
   }
-  if (typeof knobs.circuitBreaker !== "boolean") bad("circuitBreaker must be a boolean");
+  if (typeof knobs.circuitBreaker !== "boolean") return "circuitBreaker must be a boolean";
   if (
     knobs.bulkhead !== null &&
     (!isInt(knobs.bulkhead) || knobs.bulkhead < d.bulkhead.min || knobs.bulkhead > d.bulkhead.max)
   ) {
-    bad(`bulkhead must be null or an integer in ${d.bulkhead.min}..${d.bulkhead.max}`);
+    return `bulkhead must be null or an integer in ${d.bulkhead.min}..${d.bulkhead.max}`;
   }
+  return null;
+}
+
+function validate(input: SimulateInput): void {
+  const { knobs, paymentSlowdown, seed } = input;
+  if (!isInt(seed)) throw new EngineError("INVALID_KNOBS", "seed must be an integer");
+  const message = knobsError(knobs);
+  if (message) throw new EngineError("INVALID_KNOBS", message);
   if (paymentSlowdown !== 1 && paymentSlowdown !== 20) {
     throw new EngineError("INVALID_FAULT", "paymentSlowdown must be 1 or 20");
   }
@@ -183,6 +201,7 @@ export function simulate(input: SimulateInput): SimulationResult {
   const horizon = HORIZON_MS;
   const rng = mulberry32(seed);
   const events: EngineEvent[] | null = input.recordEvents ? [] : null;
+  const timeline: TimelineSample[] | null = input.recordTimeline ? [] : null;
 
   let t = 0;
   let eventCount = 0;
@@ -455,6 +474,20 @@ export function simulate(input: SimulateInput): SimulationResult {
         ns[id].queueMs += ns[id].queue.length;
       }
     }
+    if (timeline && t % TIMELINE_STEP_MS === 0) {
+      timeline.push({
+        t,
+        nodes: {
+          gateway: { busy: ns.gateway.busy, queue: ns.gateway.queue.length },
+          order: { busy: ns.order.busy, queue: ns.order.queue.length },
+          cache: { busy: ns.cache.busy, queue: ns.cache.queue.length },
+          payment: { busy: ns.payment.busy, queue: ns.payment.queue.length },
+          db: { busy: ns.db.busy, queue: ns.db.queue.length },
+        },
+        outcomes: { succeeded, degraded, failed },
+        breaker: breaker.state,
+      });
+    }
     if (eventCount > MAX_EVENTS) {
       incomplete = true;
       break;
@@ -501,5 +534,6 @@ export function simulate(input: SimulateInput): SimulationResult {
   };
   const result: SimulationResult = { ...body, runHash: fnv1a(JSON.stringify({ seed, knobs, paymentSlowdown, body })) };
   if (events) result.events = events;
+  if (timeline) result.timeline = timeline;
   return result;
 }

@@ -1,6 +1,6 @@
 # Agent and Tools Spec
 
-The agent is Muse Spark through the Meta Model API (exact model ID recorded at the spike, D-009). It acts only through the tools below. The engine is the only source of numbers.
+The agent is Muse Spark (`muse-spark-1.3`) through the Meta Model API Responses endpoint (D-022). `tool_choice` supports only `auto`, so a text-only turn is treated as invalid and re-prompted once within budget; several tool calls in one turn are executed in order and each returns its own result. It acts only through the tools below. The engine is the only source of numbers.
 
 ## 1. Task and boundaries
 
@@ -19,7 +19,7 @@ The agent is Muse Spark through the Meta Model API (exact model ID recorded at t
 | `get_trace` | `runId`, `requestId` | per-hop events for one request | `UNKNOWN_RUN`, `UNKNOWN_REQUEST` |
 | `propose_patch` | `baseKnobs`, `patch` (subset of the four knobs) | `candidateKnobs`, structural diff | `INVALID_KNOBS`, `UNKNOWN_FIELD` |
 | `compare` | `runA`, `runB` | metric deltas and `matched: true` | `COMPARISON_MISMATCH` |
-| `conclude` | `claims[]`, `rejectedProposals[]`, `limits[]` | accepted or blocked claims | `CLAIM_BLOCKED` |
+| `conclude` | `claims[]`, `rejectedProposals[]` (statements), `limits[]` (strings) | `accepted: true`, or error `CLAIM_BLOCKED` with the blocked statements and reasons | `CLAIM_BLOCKED` |
 
 - `compare` requires the same seed, same `paymentSlowdown` and same engine version. Only knob values may differ; otherwise it returns `COMPARISON_MISMATCH`.
 - A run that hits the event limit is `RUN_INCOMPLETE`. It is never ranked and never described as a success.
@@ -37,30 +37,42 @@ The agent is Muse Spark through the Meta Model API (exact model ID recorded at t
 
 ## 4. Budget and stop rules
 
-- Max 8 `simulate` calls and 24 tool calls per investigation. Increasing either needs an explicit user action.
+- Max 8 `simulate` calls and 24 tool calls per investigation (rejected calls count). `conclude` is exempt from the 24 so a model that used every call can still finish, but it is capped at 4 attempts (D-025). When the tool or simulation budget is used, the loop tells the model to call `conclude` once. Increasing a budget needs an explicit user action.
 - Stop when the question is answered within scope, the budget is used, a run fails repeatedly, the provider is unavailable, or the user cancels.
 - "Insufficient evidence" is a valid final answer and must say what is missing.
 
 ## 5. Claims and the claim checker
 
-A claim is `{ text, numbers: [{ token, metricPath, runId }] }`.
+A statement (claim or rejected proposal) is `{ text, numbers, comparison }`. Implemented in `lib/agent/claims.ts`; contracts in `lib/contracts/claims.ts`.
 
-- Metric path syntax: `<runId>.<path>`, for example `run-3.errorRate` or `run-3.nodes.order.occupiedSlotFraction`.
-- Every numeric token in `text` must appear in `numbers`. A number with no entry is blocked.
-- A stated value must equal the recorded metric after the stated rounding. Percentages are the metric times 100, rounded to the number of decimals written.
-- Knob values in text (for example "retries=3") are checked against the arguments of a recorded `simulate` call.
-- A blocked claim is not shown as a conclusion. The UI shows it as a blocked claim with the reason, and the agent may revise within budget.
-- A causal statement ("retries multiplied Payment load because ...") requires a recorded comparison between two matched runs.
-- Do not claim that retries raised the error rate. In this scenario they do not (D-016); claims must match the recorded metrics, for example `paymentAttemptsPerRequest` and `latencyMs.p95`.
+- `numbers` entries: `{ token, kind: "metric", path }` with path `run-3.errorRate` or `run-3.nodes.order.occupiedSlotFraction`; `{ kind: "knob", runId, field }`; `{ kind: "seed", runId }`; `{ kind: "ratio", numerator, denominator }` (metric paths); `{ kind: "difference", from, to }` (metric paths, to minus from).
+- Every numeric token in `text` must have an entry with the same digits, and every entry's token must appear in `text`. Run ids (`run-3`), names like `p95` and model ids are not treated as numbers.
+- A stated value must equal the recorded value rounded to the stated precision. A percentage is the value times 100, rounded to the decimals written.
+- Numbers must be written as digits. Spelled-out numbers (three, half, doubled, ...) are blocked because they cannot be checked; "one" is exempt as a pronoun. This is a known limit: wording like "a few" is not checked.
+- Limits (`limits[]`) carry scope only and may contain no numbers.
+- Causal wording (because, led to, ...) needs `comparison: { runA, runB }` naming two runs that a successful `compare` call recorded.
+- A sentence that says the error rate went up or down needs a recorded comparison, and the recorded `errorRate` change (B minus A) must have that direction. Negated sentences ("did not raise") are not treated as directional. This enforces D-016 from data and does not hard-code the finding.
+- `conclude` is all-or-nothing: if any statement is blocked, nothing is concluded, the blocked statements and reasons are returned and kept for the UI, and the agent may revise within budget. A blocked statement is never shown as a conclusion.
+- An empty `claims` array with `limits` is a valid "insufficient evidence" conclusion.
+- Do not claim that retries raised the error rate. In this scenario they do not (D-016); cite `paymentAttemptsPerRequest` and `latencyMs.p95` instead.
 
 ## 6. Replay mode
 
-- The app ships one recorded golden agent session (`data/golden/`) with its tool calls and results.
-- In Replay mode the UI replays those turns under a visible "Replay" label, while the engine re-runs each `simulate` call live. If the live result hash differs from the recorded one, the UI shows a mismatch error instead of the replay.
-- Replay is never presented as a fresh agent run.
+- The app ships one recorded real agent session: `public/golden/slow-payment-run-1.json` (format version 1; served as a static file, see D-030). It holds the question, the full transcript (assistant text, tool calls, tool results, nudges), the final outcome (conclusion, blocked statements, usage), provenance (`recorded`: date, model, engine version, source, note) and a content hash. It is built from a real `/api/agent` transcript by `scripts/build-golden.mjs`, which copies it without inventing anything and aborts if the API key appears in it.
+- `verifyGolden()` in `lib/agent/replay.ts` runs before anything is shown: format and version, structure (every result follows its call), content hash, engine version, a secret scan, no engine event stream in the file, then **every recorded tool call is re-executed on the live engine and must produce exactly the recorded result**, and the recorded outcome (conclusion, blocked statements, usage) must equal the replayed one. Any failure returns a named error (`HASH_MISMATCH`, `ENGINE_VERSION_MISMATCH`, `REPLAY_MISMATCH` with the entry index, ...) and the UI shows a mismatch error instead of the replay.
+- The UI fetches the file at runtime and parses it with the browser's `JSON.parse`; it is never imported through the bundler, which rounds floats in imported JSON in the last digit (D-030).
+- Replay is shown under a persistent "Replay" label and is never presented as a fresh agent run. If the engine changes, the engine version check fails and the golden run must be re-recorded.
+- The current golden run was recorded with the system prompt before the default-baseline sentence (D-027); behavior for that question is unchanged in trial 2.
 
 ## 7. Failure behavior
 
 - Provider timeout or error: bounded retry for transport errors, then a visible "Agent unavailable" state. Manual simulation stays usable.
 - Invalid tool call from the model: rejected with a machine-readable code, returned to the model once, counted against the budget.
 - Missing API key: Replay mode, labeled.
+
+## 8. Implementation notes (T12)
+
+- `lib/agent/loop.ts`: `investigate()` keeps the full ordered history itself and sends it each turn (D-024). It records a transcript (user, assistant text, tool call, tool result, nudge, status) and calls `onEntry` for each entry, which the route streams. Statuses: `complete`, `insufficient`, `budget_exceeded` (turn limit, 24), `provider_unavailable`, `invalid_output` (two text-only turns), `cancelled`.
+- `lib/agent/provider.ts`: `MetaProvider` posts to `https://api.meta.ai/v1/responses` with model `muse-spark-1.3`, `tool_choice: "auto"`, no `previous_response_id`. 429, 5xx and network errors are retried up to 3 times with 500 ms, 1 s, 2 s backoff; other 4xx are not. Errors never contain the key.
+- `lib/agent/prompt.ts`: documents the system, knobs, metrics, confirmation rule and `conclude` rules. It does not say which fix works.
+- `app/api/agent/route.ts`: `POST {question}` streams NDJSON lines `{kind:"entry", entry}` and a final `{kind:"outcome", status, detail, turns, usage, conclusion, blocked}`. One investigation at a time (429 BUSY). Without `MODEL_API_KEY` it returns 503 `NO_API_KEY` so the UI switches to Replay mode. The hosted replay-only build must not set the key (D-020).
