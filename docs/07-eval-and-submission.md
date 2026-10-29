@@ -23,7 +23,7 @@ Decision rule: if confirmed fixes are fewer than 3 of 6 while the engine is soli
 
 ## 3. Claim checker tests
 
-A fabricated number is blocked; a matching number passes; a rounding mismatch is blocked; an unlisted numeric token is blocked; a knob value not in any recorded call is blocked. Result: _not run_.
+A fabricated number is blocked; a matching number passes; a rounding mismatch is blocked; an unlisted numeric token is blocked; a knob value not in any recorded call is blocked. Result (2026-10-29): 22 tests pass in `lib/agent/claims.test.ts`, covering each case above plus ratio, difference, seed, causal-wording and error-rate-direction cases. Full suite: 74 of 74.
 
 ## 4. Tester check (3 people, not friends or family if avoidable)
 
@@ -37,12 +37,17 @@ A fabricated number is blocked; a matching number passes; a rounding mismatch is
 
 ## 5. Submission package
 
-- [ ] README: video link first, then setup (`npm install`, optional `.env.local` with `META_API_KEY`, `npm run dev`), what works, what is replay, known limits, Meta model usage statement, architecture in one diagram, test results including misses.
+- [ ] README: video link first, then setup (`npm install`, optional `.env.local` with `MODEL_API_KEY`, `npm run dev`), what works, what is replay, known limits, Meta model usage statement, architecture in one diagram, test results including misses.
 - [ ] `.env.example` with placeholders only; `git log -p` checked for secrets.
 - [ ] Golden run JSON committed so Replay mode works without a key.
 - [ ] Clean-clone run from the README only, with and without a key.
 - [ ] 3-minute video from real output; replay segments labeled.
 - [ ] Submission text: problem in Afras's words, track (Indie Developer), Best Agentic Use-Case fit if the portal allows, limits.
+- [ ] Repo is public; video link works logged out; everyone who worked on it is listed.
+- [ ] README has a "Built during the hackathon" section: what is new (engine, agent, UI, tests, docs) and the create-next-app boilerplate disclosed.
+- [ ] Optional: X post with the demo, link submitted on the platform (Most Viral, counts until Nov 8 EOD).
+- [ ] Accepted (D-020): replay-only hosted build as a convenience link, with no Meta key on the server.
+- [ ] Meta API credits claimed with the form before Nov 4, 9 PM ET, spend limit set.
 - [ ] Portal rules rechecked (doc 02); submission opened as a judge would see it.
 
 ## 6. Cut order if behind

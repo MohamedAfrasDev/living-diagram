@@ -10,7 +10,7 @@ LivingDiagrams is an agent that investigates why a backend design fails. It runs
 
 "I added retries to make my service resilient, and I could not tell whether I had helped or caused a worse outage. A chatbot gave me a confident answer I could not verify."
 
-- Who: students and early-career backend developers who know the patterns (timeouts, retries, circuit breakers, bulkheads) but have never watched them fail.
+- Who (D-021): **backend developers** reviewing a service's resilience settings before they ship: they know the patterns (timeouts, retries, circuit breakers, bulkheads) but cannot tell whether a setting helps or hurts under a slow dependency. Students are a secondary audience. This is an agent and simulator, not a tutoring chatbot.
 - Today's workaround: blog posts, chatbots, guessing. Real chaos tooling is too heavy.
 - Frequency is low and intensity is high, so this is a learning tool, not a daily tool.
 
@@ -42,15 +42,16 @@ A local Next.js app with one screen and one task: "Checkout is failing, payment 
 
 ## Not building
 
-Hosting or deployment, accounts, Supabase, SAM, voice, image or sketch import, diagram authoring, load balancers, replicas, outages, queues-to-workers, deadlines, stochastic workloads, comparison UI beyond two runs side by side, evidence export (cut first if behind).
+Hosting a live-agent deployment (a replay-only link is allowed, D-020), accounts, Supabase, SAM, voice, image or sketch import, diagram authoring, load balancers, replicas, outages, queues-to-workers, deadlines, stochastic workloads, comparison UI beyond two runs side by side, evidence export (cut first if behind).
 
 ## How judges use it (no hosting required)
 
 The host confirmed a deployed backend is not needed. A working demo means it runs from the setup instructions plus the demo video.
 
 - Video: 3 minutes, real output, replay segments labeled.
-- Local run: `npm install`, optional `.env.local` with a Meta API key, `npm run dev`.
+- Local run: `npm install`, optional `.env.local` with `MODEL_API_KEY`, `npm run dev`.
 - Without a key the app opens in Replay mode: the engine runs live, agent turns come from a recorded golden run and are labeled "Replay".
+- Hosted link (D-020): a replay-only build with no Meta key on the server, published after the core is done, as a convenience for judges.
 
 ## Success
 
@@ -61,6 +62,7 @@ The host confirmed a deployed backend is not needed. A working demo means it run
 
 ## Hard constraints
 
-- Deadline: Nov 2 (stated by Afras). Official cutoff time and timezone unconfirmed; plan to submit Nov 1.
+- Official deadline: Wed Nov 4, 9:00 PM ET (guide; 7:30 AM Nov 5 in Sri Lanka). Internal freeze: Nov 2, leaving Nov 3-4 as buffer.
+- Repo must be public; the demo must show only what was built during the event (Oct 27 - Nov 4) and say so.
 - Only work built from Oct 26, 2026 counts; no reuse of older code.
 - The Meta API key stays on the server (env var, never committed).

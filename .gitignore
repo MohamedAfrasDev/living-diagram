@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# spike output (scripts/spike-tool-calling.mjs)
+scripts/spike-results.json
+
+# keep the example env file
+!.env.example
