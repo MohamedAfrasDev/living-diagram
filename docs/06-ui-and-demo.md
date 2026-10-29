@@ -34,6 +34,8 @@ Keyboard reachable controls, text labels on outcomes, a reduced-motion setting t
 
 ## 6. Demo video (3 minutes, real output; replay segments labeled)
 
+The full script, with the voiceover, on-screen requirements and what not to say, is `docs/08-demo-script.md`. The table below is the original outline.
+
 | Time | Content |
 | --- | --- |
 | 0:00-0:20 | The firsthand problem in the first sentence |

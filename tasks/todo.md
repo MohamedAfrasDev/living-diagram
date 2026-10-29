@@ -40,8 +40,8 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 ## Phase 4: Submission (Nov 1; Nov 2 buffer)
 
 - [ ] T19: Clean-clone run from README only. Done without a key (2026-10-29); still to do with a key, and again after the final commit
-- [ ] T20: 3-tester check (doc 07)
-- [ ] T21: 3-minute video from real output, replay segments labeled
+- [ ] T20: 3-tester check (protocol written, doc 07 section 4; testers not yet recruited or run)
+- [ ] T21: 3-minute video from real output, replay segments labeled (script written: docs/08-demo-script.md; Afras records; two blanks: opening story, tester result)
 - [x] T22a: Hosted replay-only guard built and tested (D-032 step 1). [ ] T22b: push to the public `main` and deploy, waiting for Afras's go
 - [ ] T22: Secrets check, repo public, X post (optional), submission text, submit before Nov 4, 9 PM ET; open it as a judge would
 

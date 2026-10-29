@@ -131,7 +131,7 @@ Development used Claude Code (Anthropic) as a coding assistant, working from the
 | `public/golden/` | the recorded agent session (served as a static file) |
 | `data/runs/` | transcripts of both agent-test trials |
 | `scripts/` | spike, agent test and golden-run builder |
-| `docs/` | specs 01 to 07 and the decision log |
+| `docs/` | specs 01 to 08 (08 is the demo script) and the decision log |
 
 ## License
 

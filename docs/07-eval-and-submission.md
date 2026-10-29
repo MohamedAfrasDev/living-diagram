@@ -36,15 +36,45 @@ Decision rule: if confirmed fixes are fewer than 3 of 6 while the engine is soli
 
 A fabricated number is blocked; a matching number passes; a rounding mismatch is blocked; an unlisted numeric token is blocked; a knob value not in any recorded call is blocked. Result (2026-10-29): 22 tests pass in `lib/agent/claims.test.ts`, covering each case above plus ratio, difference, seed, causal-wording and error-rate-direction cases. Full suite: 74 of 74.
 
-## 4. Tester check (3 people, not friends or family if avoidable)
+## 4. Tester check (3 people; protocol written before any test)
 
-- Protocol written before testing: watch silently, no help, record where they stall.
-- Questions: (1) what did the agent try first and what happened, (2) why did `retries=3` not help, (3) what is the cost of the working fix (the degraded responses).
-- Bar: at least 2 of 3 answer (2) correctly unaided (it multiplied load and tail latency without lowering errors). Report the sample size; do not claim learning gains.
+Purpose: find out whether someone who has never seen the tool can follow what the agent did and explain two things it shows. This is exploratory evidence with three people, not a study. It supports the Impact story only as far as it goes, and no learning gain is claimed.
 
-| Tester | Unaided | Explained retries result | Stalls |
-| --- | --- | --- | --- |
-| 1-3 | _not run_ | | |
+**Who.** Three people who have not seen the project: developers or CS students, not family. Friends are allowed only if no one else is available, and then it is noted in the table. Each is told they can stop at any time, that notes (not their name) are kept, and is asked before any quote is used.
+
+**Setup.** One laptop with the production build open in **Replay** (green "Replay verified" badge showing). Screen recording only with the tester's permission. The facilitator stays silent except for the script below. If the replay does not verify, stop, note it, and fix it before continuing: a failed verification is not a tester result.
+
+**Script (read as written).**
+1. "This is a tool that investigates why a backend design fails. I will not explain it, because I want to see what is clear and what is not. Please think aloud. You can stop any time."
+2. **Before they touch anything:** "Imagine a checkout service whose payment dependency becomes 20 times slower, and someone adds retries. What do you expect happens to the error rate? And to the load on the payment service?" Write the answer down word for word.
+3. Task: "Find out why checkout is failing and what the agent recommends. Use the tool however you like. You have 10 minutes."
+4. If silent for 2 minutes: "What would you do next?" (the only allowed nudge; count each use). If they ask what something means: "What do you think it means?"
+5. **After** they say they are done:
+   - Q1. "What did the agent try first, and what happened?"
+   - Q2. "Why did retries not help?"
+   - Q3. "What does the working fix cost?"
+   - Q4. "Pick one number in the conclusion. Where does it come from?" (they point to it)
+   - Q5. "Was there anything you did not trust or did not understand?"
+   - Q6. "Would you use this on a service of yours? What would you need to see first?"
+   - Repeat the step 2 questions: "What do you expect now for retries: error rate and load?"
+6. If they ask whether it is live: "This is a recorded session of the agent, replayed and checked against the live simulator. The 'Run it by hand' panel is live." (Truthful; do not say more.)
+
+**Scoring (fixed now).**
+- *Completed unaided:* reached the Conclusion card and stated the agent's recommendation, with zero nudges beyond step 4 and no explanation from the facilitator.
+- *Q2 correct:* names **both** that retries sent more attempts or load to Payment (or made it slower) **and** that they did not lower the error rate meaningfully. One without the other is partial and counts as not correct.
+- *Q3 correct:* says a large share of requests are served degraded (not fully successful) or that the breaker hides rather than fixes the failure.
+- *Q4 traced:* correctly points to the run or metric the number comes from.
+- Also recorded: minutes to first conclusion, number of nudges, where they stalled, the before and after answers (changed or not), the verbatim answer to Q5 and Q6.
+
+**Bars.** At least 2 of 3 answer Q2 correctly **unaided** (the bar in section 2). Reported without a bar: Q3, Q4, completion, time, stalls. Report the sample size of 3 wherever a result is quoted, and report every miss.
+
+| Tester | Role, and friend? | Completed unaided | Minutes | Nudges | Q2 | Q3 | Q4 | Stalls and confusion | Before to after (retries) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | | | | | | | | | |
+| 2 | | | | | | | | | |
+| 3 | | | | | | | | | |
+
+Status: _not run_.
 
 ## 5. Submission package
 
