@@ -46,3 +46,15 @@ Keyboard reachable controls, text labels on outcomes, a reduced-motion setting t
 ## 7. Out of scope here
 
 Project home, saved projects, authoring, onboarding, settings, charts beyond the metric table, hosting.
+
+## 8. Implementation notes (T15 to T17)
+
+Built in `app/_components/` (`Workspace`, `Canvas`, `Playback`, `Timeline`, `Evidence`, `ManualRun`) with pure helpers in `lib/ui/`.
+
+- **System pane:** a canvas of the five nodes with busy-slot and queue gauges, a "FULL" text label when a gauge is saturated, the breaker state and a "20x slower" tag. It draws one sample of the engine's own occupancy timeline (`recordTimeline`, every 50 ms of virtual time, not part of the run hash), plus play, pause, restart, speed and a time slider. A "Show node state as a table" alternative opens by default under reduced motion, and reduced motion also disables autoplay and stepped replay.
+- **Agent pane:** question box, "Ask the agent" (live, streamed from `/api/agent`), "Replay recorded run" (stepwise, with "Show all"), a card per tool call and result (rejected calls shown with their error code), blocked statements as a red "Blocked: not shown as a conclusion" card with the reasons, and the final conclusion with rejected proposals and a Limits card.
+- **Evidence pane:** run selector and "Compare with" selector, knob and fault chips, a metric table with changes marked by arrows and the words "better" or "worse" (so colour is not the only signal), error rate and degraded rate adjacent, per-node detail, a scope card and the run hash. Runs that differ in seed or fault show "Not comparable" and no deltas.
+- **Manual mode:** the four knobs, the fault toggle and a seed, run on the same engine in the browser. Invalid values disable the button and say why. Works without a key.
+- **Replay:** the golden file is fetched and verified before anything is shown; a persistent amber "Replay" banner and badge mark it; a failed verification shows a red alert and hides the recording. With no API key, "Ask the agent" shows a notice and falls back to Replay.
+- **Checked in a browser (Chrome pane):** replay verified and autoplayed, stepwise replay and "Show all", a manual run compared with the baseline, one live agent run streamed to completion, the no-key fallback on a production build, and a 375 px phone viewport with no horizontal overflow. `npm run build` passes (`/` static, `/api/agent` dynamic).
+- **Not yet done:** an automated browser test, keyboard-only pass, light-theme visual check, README and `.env.example` (T18).

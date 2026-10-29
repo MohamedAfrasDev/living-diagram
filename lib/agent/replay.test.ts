@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { computeContentHash, verifyGolden, type GoldenRun } from "./replay";
 
-const PATH = "data/golden/slow-payment-run-1.json";
+const PATH = "public/golden/slow-payment-run-1.json";
 const load = (): GoldenRun => JSON.parse(readFileSync(PATH, "utf-8")) as GoldenRun;
 
 // Tamper, then re-hash, so the content hash passes and only the engine replay can catch it.

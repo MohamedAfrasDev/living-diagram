@@ -32,9 +32,9 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 
 ## Phase 3: UI (Oct 31)
 
-- [ ] T15: Canvas replaying engine events; per-node queue and slot animation
-- [ ] T16: Agent timeline, evidence panel, manual knob mode, blocked-claim display
-- [ ] T17: Replay mode with visible label and hash-mismatch check; degraded and error states
+- [x] T15: Canvas drawing the engine's occupancy timeline (`recordTimeline`), with playback and a table alternative
+- [x] T16: Agent timeline, evidence panel with matched comparison, manual knob mode, blocked-claim display, conclusion and limits cards
+- [x] T17: Replay mode (verified before shown, persistent label), live streaming, no-key fallback, load and failure states. Checked in a browser; production build passes
 - [ ] T18: `.env.example`, README draft
 
 ## Phase 4: Submission (Nov 1; Nov 2 buffer)
