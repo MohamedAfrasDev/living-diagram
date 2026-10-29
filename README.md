@@ -40,7 +40,7 @@ cp .env.example .env.local
 # edit .env.local and set MODEL_API_KEY=<your Meta Model API key>
 ```
 
-The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (113 tests), `npm run build`, `npm run lint`.
+The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (119 tests), `npm run build`, `npm run lint`. Every way to use it, with what to expect, is in [docs/09-usage.md](docs/09-usage.md).
 
 ## What you will see
 
@@ -94,7 +94,7 @@ Everything below is in `docs/` with transcripts in `data/runs/`.
 
 | Check | Result |
 |---|---|
-| Unit and integration tests | 113 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers |
+| Unit and integration tests | 119 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers, the replay-only guard |
 | Tool-calling spike (10 runs) | **9 of 10** after correcting my scorer. The first scorer gave 6 of 10 because it rejected the model's own tool arguments, and one run hit a provider error (D-023) |
 | Agent test, trial 1 (6 live runs) | valid calls 6/6, **confirmed fix 3/6 (bar was 4: missed)**, unsupported numbers 0 |
 | Agent test, trial 2 | after one sentence in the system prompt defining the default settings: valid 6/6, **confirmed fix 5/6**, unsupported numbers 0. Trial 1 stays on record; the prompt change was made after seeing it (D-027, D-028) |
@@ -131,7 +131,7 @@ Development used Claude Code (Anthropic) as a coding assistant, working from the
 | `public/golden/` | the recorded agent session (served as a static file) |
 | `data/runs/` | transcripts of both agent-test trials |
 | `scripts/` | spike, agent test and golden-run builder |
-| `docs/` | specs 01 to 08 (08 is the demo script) and the decision log |
+| `docs/` | specs 01 to 09 (08 is the demo script, 09 the usage guide) and the decision log |
 
 ## License
 
