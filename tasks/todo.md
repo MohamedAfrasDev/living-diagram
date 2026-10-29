@@ -35,11 +35,11 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 - [x] T15: Canvas drawing the engine's occupancy timeline (`recordTimeline`), with playback and a table alternative
 - [x] T16: Agent timeline, evidence panel with matched comparison, manual knob mode, blocked-claim display, conclusion and limits cards
 - [x] T17: Replay mode (verified before shown, persistent label), live streaming, no-key fallback, load and failure states. Checked in a browser; production build passes
-- [ ] T18: `.env.example`, README draft
+- [x] T18: `.env.example` and README written and checked from a clean clone (no key). Placeholders to fill before submission: video link, hosted link, the author's firsthand note, tester results
 
 ## Phase 4: Submission (Nov 1; Nov 2 buffer)
 
-- [ ] T19: Clean-clone run from README only, with and without a key
+- [ ] T19: Clean-clone run from README only. Done without a key (2026-10-29); still to do with a key, and again after the final commit
 - [ ] T20: 3-tester check (doc 07)
 - [ ] T21: 3-minute video from real output, replay segments labeled
 - [ ] T22: Secrets check, repo public, X post (optional), submission text, submit before Nov 4, 9 PM ET; open it as a judge would

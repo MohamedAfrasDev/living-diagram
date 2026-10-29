@@ -48,14 +48,14 @@ A fabricated number is blocked; a matching number passes; a rounding mismatch is
 
 ## 5. Submission package
 
-- [ ] README: video link first, then setup (`npm install`, optional `.env.local` with `MODEL_API_KEY`, `npm run dev`), what works, what is replay, known limits, Meta model usage statement, architecture in one diagram, test results including misses.
-- [ ] `.env.example` with placeholders only; `git log -p` checked for secrets.
-- [ ] Golden run JSON committed so Replay mode works without a key.
-- [ ] Clean-clone run from the README only, with and without a key.
+- [x] README written (placeholders remain: video link, hosted link, the author's firsthand note, tester results): video link first, then setup (`npm install`, optional `.env.local` with `MODEL_API_KEY`, `npm run dev`), what works, what is replay, known limits, Meta model usage statement, architecture in one diagram, test results including misses.
+- [x] `.env.example` with a placeholder only. [ ] `git log -p` still to be checked for secrets before the repo is made public.
+- [x] Golden run JSON committed (`public/golden/`) so Replay mode works without a key.
+- [x] Clean-clone run without a key (2026-10-29, commit 16dbb6c): `git clone`, `npm install` (73 s), `npm test` 113 of 113, `npm run build`, dev server 200, `/api/agent` answers `NO_API_KEY`, Replay verified in the browser (CRLF line endings from git on Windows do not affect it). [ ] Still to do: the same with a key from a clean clone.
 - [ ] 3-minute video from real output; replay segments labeled.
 - [ ] Submission text: problem in Afras's words, track (Indie Developer), Best Agentic Use-Case fit if the portal allows, limits.
 - [ ] Repo is public; video link works logged out; everyone who worked on it is listed.
-- [ ] README has a "Built during the hackathon" section: what is new (engine, agent, UI, tests, docs) and the create-next-app boilerplate disclosed.
+- [x] README has a "Built during the hackathon" section: what is new (engine, agent, UI, tests, docs) and the create-next-app boilerplate disclosed.
 - [ ] Optional: X post with the demo, link submitted on the platform (Most Viral, counts until Nov 8 EOD).
 - [ ] Accepted (D-020): replay-only hosted build as a convenience link, with no Meta key on the server.
 - [ ] Meta API credits claimed with the form before Nov 4, 9 PM ET, spend limit set.
