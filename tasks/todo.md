@@ -26,7 +26,7 @@ Checkpoint: engine tests green (33 of 33); engine has no agent or network import
 - [x] T11: Claim checker and `conclude` tool (`lib/agent/claims.ts`, 22 tests): fabricated, rounding, unlisted-token, knob, seed, ratio, difference, number-word, causal and direction cases
 - [x] T12: Agent loop (`lib/agent/loop.ts`), Meta provider (`provider.ts`), system prompt (`prompt.ts`), route `app/api/agent/route.ts` (NDJSON stream, key server-side, 503 NO_API_KEY without a key). 15 new tests with a scripted provider. One live run completed (see doc 07, exploratory)
 - [x] T13: Agent test. Trial 1: valid 6/6, confirmed fix 3/6 (bar 4, missed), unsupported 0. Trial 2 after a one-sentence prompt clarification: valid 6/6, confirmed fix 5/6 (bar met), unsupported 0 (doc 07, D-027, D-028)
-- [ ] T14: Record one real golden agent session to `data/golden/`
+- [x] T14: Golden run `data/golden/slow-payment-run-1.json` built from a real transcript (`scripts/build-golden.mjs`) and verified against the live engine by `lib/agent/replay.ts` (11 tests); the UI Replay mode (T17) will call `verifyGolden` before showing it
 
 Checkpoint: slow-payment investigation completes with no unsupported number reaching the user.
 

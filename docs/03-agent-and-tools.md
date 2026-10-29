@@ -58,9 +58,10 @@ A statement (claim or rejected proposal) is `{ text, numbers, comparison }`. Imp
 
 ## 6. Replay mode
 
-- The app ships one recorded golden agent session (`data/golden/`) with its tool calls and results.
-- In Replay mode the UI replays those turns under a visible "Replay" label, while the engine re-runs each `simulate` call live. If the live result hash differs from the recorded one, the UI shows a mismatch error instead of the replay.
-- Replay is never presented as a fresh agent run.
+- The app ships one recorded real agent session: `data/golden/slow-payment-run-1.json` (format version 1). It holds the question, the full transcript (assistant text, tool calls, tool results, nudges), the final outcome (conclusion, blocked statements, usage), provenance (`recorded`: date, model, engine version, source, note) and a content hash. It is built from a real `/api/agent` transcript by `scripts/build-golden.mjs`, which copies it without inventing anything and aborts if the API key appears in it.
+- `verifyGolden()` in `lib/agent/replay.ts` runs before anything is shown: format and version, structure (every result follows its call), content hash, engine version, a secret scan, no engine event stream in the file, then **every recorded tool call is re-executed on the live engine and must produce exactly the recorded result**, and the recorded outcome (conclusion, blocked statements, usage) must equal the replayed one. Any failure returns a named error (`HASH_MISMATCH`, `ENGINE_VERSION_MISMATCH`, `REPLAY_MISMATCH` with the entry index, ...) and the UI shows a mismatch error instead of the replay.
+- Replay is shown under a persistent "Replay" label and is never presented as a fresh agent run. If the engine changes, the engine version check fails and the golden run must be re-recorded.
+- The current golden run was recorded with the system prompt before the default-baseline sentence (D-027); behavior for that question is unchanged in trial 2.
 
 ## 7. Failure behavior
 
