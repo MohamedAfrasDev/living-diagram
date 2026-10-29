@@ -59,7 +59,8 @@ Built in `app/_components/` (`Workspace`, `Canvas`, `Playback`, `Timeline`, `Evi
 - **Manual mode:** the four knobs, the fault toggle and a seed, run on the same engine in the browser. Invalid values disable the button and say why. Works without a key.
 - **Replay:** the golden file is fetched and verified before anything is shown; a persistent amber "Replay" banner and badge mark it; a failed verification shows a red alert and hides the recording. With no API key, "Ask the agent" shows a notice and falls back to Replay.
 - **Checked in a browser (Chrome pane):** replay verified and autoplayed, stepwise replay and "Show all", a manual run compared with the baseline, one live agent run streamed to completion, the no-key fallback on a production build, and a 375 px phone viewport with no horizontal overflow. `npm run build` passes (`/` static, `/api/agent` dynamic).
-- **Not yet done:** an automated browser test, keyboard-only pass, light-theme visual check, README and `.env.example` (T18).
+- **Light theme:** checked on a fresh production build at desktop width (D-036); not yet checked at phone width.
+- **Not yet done:** an automated browser test and a keyboard-only pass.
 
 ## 9. Hosted replay-only build (plan, D-020; nothing deployed yet)
 
