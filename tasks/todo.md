@@ -46,3 +46,14 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 - [ ] T22: Secrets check, repo public, X post (optional), submission text, submit before Nov 4, 9 PM ET; open it as a judge would
 
 Cut order if behind: evidence export, second scenario, extra testers, panel polish. Never cut the golden test, claim checker, a live engine run, or the Replay label.
+
+## Phase 5: Your numbers (option B, proposed D-037; build only after approval)
+
+- [ ] T23: Save the default-prompt fixture and the default run hashes; write the failing tests for gates G1 to G6
+- [ ] T24: Engine: `Scenario`, `DEFAULT_SCENARIO`, validation, simulate reads it; default hashes unchanged (G1, G3, G4, G5)
+- [ ] T25: Tools, contracts, `buildSystemPrompt`, route (`scenario` in the body) (G2, G6)
+- [ ] T26: UI: Your numbers card, per-run scenario snapshot, canvas and evidence read the run's scenario, comparison rule
+- [ ] T27: Browser checks light, dark and phone (G7); three live agent runs on a custom scenario, reported as exploratory (G8)
+- [ ] T28: Docs and wording: README limits, docs 04, 05, 06, 09, demo script; PR
+
+Kill criteria: G1 not green by end of Oct 30 means option A; UI not done by end of Oct 31 means engine and manual panel only, or revert.
