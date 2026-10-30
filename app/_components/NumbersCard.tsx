@@ -8,7 +8,8 @@
 // the numbers are valid.
 import { useState } from "react";
 import { DEFAULT_SCENARIO, NODE_IDS, SCENARIO_BOUNDS, arrivalCount, isDefaultScenario, type NodeId, type Scenario } from "@/lib/engine/scenario";
-import { describeNumbers, draftFromScenario, scenarioFromDraft, type NodeDraft, type ScenarioDraft } from "@/lib/ui/numbers";
+import { applyToDraft, describeNumbers, draftFromScenario, scenarioFromDraft, type NodeDraft, type ScenarioDraft } from "@/lib/ui/numbers";
+import { IncidentText } from "./IncidentText";
 import { Badge, Button, Card } from "./ui";
 
 const LABEL: Record<NodeId, string> = { gateway: "Gateway", order: "Order", cache: "Cache", payment: "Payment", db: "DB" };
@@ -20,7 +21,7 @@ const COLUMNS = [
 
 const input = "num w-full rounded-md border bg-surface px-2 py-1 text-sm";
 
-export function NumbersCard({ onChange }: { onChange: (scenario: Scenario | null) => void }) {
+export function NumbersCard({ onChange, incidentOffReason }: { onChange: (scenario: Scenario | null) => void; incidentOffReason: string | null }) {
   const [draft, setDraft] = useState<ScenarioDraft>(() => draftFromScenario(DEFAULT_SCENARIO));
   const check = scenarioFromDraft(draft);
   const custom = check.ok && !isDefaultScenario(check.scenario);
@@ -106,6 +107,8 @@ export function NumbersCard({ onChange }: { onChange: (scenario: Scenario | null
           </label>
         </div>
         {hint ? <p className="mt-1 text-[11px] text-muted">{hint}</p> : null}
+
+        <IncidentText offReason={incidentOffReason} onApply={(values) => update(applyToDraft(draft, values))} />
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <Button onClick={reset} disabled={!custom && check.ok}>

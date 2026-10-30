@@ -1,6 +1,7 @@
 // The Your numbers form: a draft of strings the user types, turned into a
 // validated Scenario (docs/10-your-numbers.md). Nothing is corrected silently:
 // an out-of-range number is an error that states the bounds.
+import type { FieldKey } from "../agent/extract";
 import { DEFAULT_SCENARIO, NODE_IDS, validateScenario, type NodeId, type Scenario } from "../engine/scenario";
 
 export interface NodeDraft {
@@ -33,6 +34,22 @@ export function draftFromScenario(s: Scenario): ScenarioDraft {
     cacheMissPercent: String(Math.round(s.cacheMissRate * 100)),
     faultFactor: String(s.faultFactor),
   };
+}
+
+// Copies reviewed, extracted values into a draft. Only the given fields change;
+// the result still goes through scenarioFromDraft, so bounds apply as usual.
+export function applyToDraft(d: ScenarioDraft, values: Partial<Record<FieldKey, number>>): ScenarioDraft {
+  const next: ScenarioDraft = { ...d, nodes: { gateway: { ...d.nodes.gateway }, order: { ...d.nodes.order }, cache: { ...d.nodes.cache }, payment: { ...d.nodes.payment }, db: { ...d.nodes.db } } };
+  for (const [key, value] of Object.entries(values) as [FieldKey, number][]) {
+    if (key === "arrivalIntervalMs") next.arrivalIntervalMs = String(value);
+    else if (key === "cacheMissRate") next.cacheMissPercent = String(Math.round(value * 100));
+    else if (key === "faultFactor") next.faultFactor = String(value);
+    else {
+      const [id, field] = key.split(".") as [NodeId, keyof NodeDraft];
+      next.nodes[id][field] = String(value);
+    }
+  }
+  return next;
 }
 
 // "nodes.payment.concurrency" becomes "Payment workers", and so on.

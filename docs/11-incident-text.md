@@ -23,7 +23,7 @@ If validation fails (a value is out of the doc 10 bounds), that field is shown a
 
 ## 3. Extraction contract
 
-A new route `POST /api/extract`, body `{ "text": string }` (1 to 6,000 characters, else 400 `INVALID_BODY`). Guard order: `REPLAY_ONLY` (409, live features off) then `NO_API_KEY` (503) then body then BUSY (429, shares the one-at-a-time lock with `/api/agent`). The key stays on the server.
+A new route `POST /api/extract`, body `{ "text": string }` (1 to 6,000 characters, else 400 `INVALID_BODY`). Guard order: `REPLAY_ONLY` (503, same as the agent route) then `NO_API_KEY` (503) then body then BUSY (429, shares the one-at-a-time lock with `/api/agent`). The key stays on the server.
 
 One model call with one tool, `submit_numbers`, and `tool_choice` auto; if the model answers in text only, re-prompt once, then return `EXTRACTION_FAILED` (same pattern as D-024). The tool takes, for each field below, either `null` or an object `{ value: number, unit: string, quote: string }`:
 

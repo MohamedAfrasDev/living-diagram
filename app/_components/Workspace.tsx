@@ -324,7 +324,7 @@ export function Workspace() {
               <p className="py-10 text-center text-sm text-muted">No run selected. Pick a step in the investigation, or run the simulator by hand.</p>
             )}
           </Card>
-          <NumbersCard onChange={setScenario} />
+          <NumbersCard onChange={setScenario} incidentOffReason={LIVE_DISABLED_REASON} />
           <ManualRun scenario={scenario} onRun={runManual} />
         </div>
 
