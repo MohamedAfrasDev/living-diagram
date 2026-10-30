@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { InvestigationStatus, TranscriptEntry } from "@/lib/agent/loop";
 import { verifyGolden, type VerifyResult } from "@/lib/agent/replay";
-import { HORIZON_MS } from "@/lib/engine/scenario";
+import { DEFAULT_SCENARIO, HORIZON_MS, isDefaultScenario, type Scenario } from "@/lib/engine/scenario";
 import { isReplayOnly, liveAgentDisabledReason } from "@/lib/hosting";
 import { simulate, type Knobs, type SimulationResult } from "@/lib/engine/simulate";
-import { DEFAULT_KNOBS, extractRuns, runInput, sampleAt, type UiRun } from "@/lib/ui/runs";
+import { DEFAULT_KNOBS, extractRuns, runInput, sameNumbers, sampleAt, type UiRun } from "@/lib/ui/runs";
 import { Canvas, NodeTable } from "./Canvas";
 import { Evidence } from "./Evidence";
+import { NumbersCard } from "./NumbersCard";
 import { ManualRun } from "./ManualRun";
 import { Playback, type Speed } from "./Playback";
 import { Timeline, type OutcomeView } from "./Timeline";
@@ -41,8 +42,8 @@ const isDefaultKnobs = (k: Knobs) => JSON.stringify(k) === JSON.stringify(DEFAUL
 
 // Open on the story: the first change the agent tried, against the fault alone.
 function pickDefaults(runs: UiRun[]): { selected: string | null; compare: string | null } {
-  const baseline = runs.find((r) => r.paymentSlowdown === 20 && isDefaultKnobs(r.knobs));
-  const firstFix = runs.find((r) => r.paymentSlowdown === 20 && !isDefaultKnobs(r.knobs) && (!baseline || r.seed === baseline.seed));
+  const baseline = runs.find((r) => r.paymentSlowdown !== 1 && isDefaultKnobs(r.knobs));
+  const firstFix = runs.find((r) => r.paymentSlowdown !== 1 && !isDefaultKnobs(r.knobs) && (!baseline || r.seed === baseline.seed));
   if (firstFix && baseline) return { selected: firstFix.id, compare: baseline.id };
   return { selected: runs[0]?.id ?? null, compare: null };
 }
@@ -79,6 +80,10 @@ export function Workspace() {
   const [notice, setNotice] = useState<string | null>(null);
   const [question, setQuestion] = useState(DEFAULT_QUESTION);
   const [manualRuns, setManualRuns] = useState<UiRun[]>([]);
+  // Your numbers: the current valid numbers, or null while the form is invalid.
+  const [scenario, setScenario] = useState<Scenario | null>(DEFAULT_SCENARIO);
+  // The numbers the current or last live agent run was made on.
+  const [liveScenario, setLiveScenario] = useState<Scenario>(DEFAULT_SCENARIO);
   const abortRef = useRef<AbortController | null>(null);
 
   const shownReplay = replayRequested ? revealed : goldenTotal;
@@ -87,7 +92,8 @@ export function Workspace() {
   const outcome: OutcomeView | null =
     mode === "live" ? liveOutcome : golden && shownReplay >= goldenTotal ? { status: golden.outcome.status as InvestigationStatus, detail: golden.outcome.detail, conclusion: golden.outcome.conclusion } : null;
 
-  const agentRuns = useMemo(() => extractRuns(entries), [entries]);
+  // Replay runs are always on the template numbers; live runs use what was sent.
+  const agentRuns = useMemo(() => extractRuns(entries, mode === "live" ? liveScenario : DEFAULT_SCENARIO), [entries, mode, liveScenario]);
   const runs = useMemo(() => [...agentRuns, ...manualRuns], [agentRuns, manualRuns]);
 
   const initial = useMemo(() => pickDefaults(golden ? extractRuns(golden.entries) : []), [golden]);
@@ -179,19 +185,20 @@ export function Workspace() {
 
   const ask = async () => {
     const q = question.trim();
-    if (!q || running || LIVE_DISABLED_REASON) return;
+    if (!q || running || LIVE_DISABLED_REASON || scenario === null) return;
     const controller = new AbortController();
     abortRef.current = controller;
     setRunning(true);
     setNotice(null);
     setMode("live");
+    setLiveScenario(scenario);
     setLiveEntries([]);
     setLiveOutcome(null);
     setSelectedId(null);
     setCompareId(null);
     let gotAny = false;
     try {
-      const res = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }), signal: controller.signal });
+      const res = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(isDefaultScenario(scenario) ? { question: q } : { question: q, scenario }), signal: controller.signal });
       if (!res.ok || !res.body) {
         const body = (await res.json().catch(() => null)) as { code?: string; message?: string } | null;
         if (body?.code === "NO_API_KEY") {
@@ -251,11 +258,13 @@ export function Workspace() {
     }
   };
 
-  const runManual = (knobs: Knobs, paymentSlowdown: 1 | 20, seed: number) => {
+  const runManual = (knobs: Knobs, paymentSlowdown: number, seed: number) => {
+    if (scenario === null) return;
     const id = `manual-${manualRuns.length + 1}`;
-    const run: UiRun = { id, source: "manual", knobs, paymentSlowdown, seed };
+    const run: UiRun = { id, source: "manual", knobs, paymentSlowdown, seed, scenario };
     setManualRuns((prev) => [...prev, run]);
-    const baseline = runs.find((r) => r.seed === seed && r.paymentSlowdown === paymentSlowdown && isDefaultKnobs(r.knobs));
+    // Compare with a matching baseline: same seed, fault and numbers, default settings.
+    const baseline = runs.find((r) => r.seed === seed && r.paymentSlowdown === paymentSlowdown && isDefaultKnobs(r.knobs) && sameNumbers(r, run));
     setCompareId(baseline && !isDefaultKnobs(knobs) ? baseline.id : null);
     selectRun(id);
   };
@@ -295,7 +304,7 @@ export function Workspace() {
 
       {mode === "replay" ? (
         <div className="mt-4 rounded-lg border border-replay/50 bg-replay-bg px-4 py-2.5 text-sm text-replay" role="note">
-          <b>Replay.</b> This is a recorded session with Muse Spark ({golden?.recorded.date ?? "loading"}), not a fresh agent run. The simulator runs live: each recorded step is re-executed on today&apos;s engine and must match.
+          <b>Replay.</b> This is a recorded session with Muse Spark ({golden?.recorded.date ?? "loading"}), not a fresh agent run. It was recorded on the template numbers. The simulator runs live: each recorded step is re-executed on today&apos;s engine and must match.
         </div>
       ) : null}
       {verification && !verification.ok ? (
@@ -314,12 +323,12 @@ export function Workspace() {
           <Card title="System" aside={selectedRun ? <Badge tone="accent">{selectedRun.id}</Badge> : null}>
             {sample && selectedRun ? (
               <>
-                <Canvas sample={sample} paymentSlowdown={selectedRun.paymentSlowdown} breakerEnabled={selectedRun.knobs.circuitBreaker} />
+                <Canvas sample={sample} scenario={selectedRun.scenario} paymentSlowdown={selectedRun.paymentSlowdown} breakerEnabled={selectedRun.knobs.circuitBreaker} />
                 <Playback t={t} playing={playing} speed={speed} disabled={false} onToggle={() => (t >= HORIZON_MS ? (seek(0), setPlaying(true)) : setPlaying(!playing))} onSeek={(v) => (setPlaying(false), seek(v))} onSpeed={setSpeed} onRestart={() => (seek(0), setPlaying(!reducedMotion))} />
                 <details className="mt-3 text-xs" open={reducedMotion}>
                   <summary className="cursor-pointer text-muted">Show node state as a table</summary>
                   <div className="mt-2">
-                    <NodeTable sample={sample} />
+                    <NodeTable sample={sample} scenario={selectedRun.scenario} />
                   </div>
                 </details>
               </>
@@ -327,7 +336,8 @@ export function Workspace() {
               <p className="py-10 text-center text-sm text-muted">No run selected. Pick a step in the investigation, or run the simulator by hand.</p>
             )}
           </Card>
-          <ManualRun onRun={runManual} />
+          <NumbersCard onChange={setScenario} />
+          <ManualRun scenario={scenario} onRun={runManual} />
         </div>
 
         <Timeline
@@ -345,7 +355,7 @@ export function Workspace() {
           onShowAll={showAll}
           onSelectRun={selectRun}
           badge={badge}
-          liveDisabledReason={LIVE_DISABLED_REASON}
+          liveDisabledReason={LIVE_DISABLED_REASON ?? (scenario === null ? "Fix the numbers in Your numbers first." : null)}
         />
 
         <div className="xl:sticky xl:top-4">

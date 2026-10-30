@@ -3,7 +3,7 @@
 // The architecture canvas. It draws one TimelineSample from a real engine run
 // (busy slots and queue depth per node, the breaker state), so the animation
 // is evidence, not decoration. Full state is also available as a table.
-import { NODE_IDS, NODES, type NodeId } from "@/lib/engine/scenario";
+import { NODE_IDS, type NodeId, type Scenario } from "@/lib/engine/scenario";
 import type { TimelineSample } from "@/lib/engine/simulate";
 import { fmtCount } from "@/lib/ui/format";
 
@@ -38,14 +38,17 @@ function Edge({ d, dashed = false }: { d: string; dashed?: boolean }) {
 
 export function Canvas({
   sample,
+  scenario,
   paymentSlowdown,
   breakerEnabled,
 }: {
   sample: TimelineSample;
-  paymentSlowdown: 1 | 20;
+  // The numbers the run was made on: gauge capacities come from here.
+  scenario: Scenario;
+  paymentSlowdown: number;
   breakerEnabled: boolean;
 }) {
-  const summary = NODE_IDS.map((id) => `${LABEL[id]} ${sample.nodes[id].busy} of ${NODES[id].concurrency} slots, queue ${sample.nodes[id].queue} of ${NODES[id].queueCapacity}`).join("; ");
+  const summary = NODE_IDS.map((id) => `${LABEL[id]} ${sample.nodes[id].busy} of ${scenario.nodes[id].concurrency} slots, queue ${sample.nodes[id].queue} of ${scenario.nodes[id].queueCapacity}`).join("; ");
   return (
     <div>
       <svg viewBox="0 0 566 368" className="h-auto w-full" role="img" aria-label={`Architecture at ${sample.t} ms. ${summary}. Circuit breaker ${breakerEnabled ? sample.breaker : "off"}.`}>
@@ -68,7 +71,7 @@ export function Canvas({
         {NODE_IDS.map((id) => {
           const { x, y } = POS[id];
           const s = sample.nodes[id];
-          const spec = NODES[id];
+          const spec = scenario.nodes[id];
           const slotsFull = s.busy >= spec.concurrency;
           const queueFull = spec.queueCapacity > 0 && s.queue >= spec.queueCapacity;
           const hot = slotsFull || queueFull;
@@ -78,11 +81,11 @@ export function Canvas({
               <text x={x + 12} y={y + 22} className="fill-foreground text-[15px] font-semibold">
                 {LABEL[id]}
               </text>
-              {id === "payment" && paymentSlowdown === 20 ? (
+              {id === "payment" && paymentSlowdown !== 1 ? (
                 <g>
                   <rect x={x + 86} y={y + 6} width={58} height={18} rx={9} className="fill-warn/15 stroke-warn" strokeWidth={1} />
                   <text x={x + 115} y={y + 19} textAnchor="middle" className="fill-warn text-[10px] font-semibold">
-                    20× slower
+                    {paymentSlowdown}× slower
                   </text>
                 </g>
               ) : null}
@@ -122,7 +125,7 @@ export function Canvas({
   );
 }
 
-export function NodeTable({ sample }: { sample: TimelineSample }) {
+export function NodeTable({ sample, scenario }: { sample: TimelineSample; scenario: Scenario }) {
   return (
     <table className="w-full text-left text-xs">
       <caption className="sr-only">Node state at {sample.t} ms of simulated time</caption>
@@ -138,12 +141,12 @@ export function NodeTable({ sample }: { sample: TimelineSample }) {
           <tr key={id} className="border-t border-border">
             <td className="py-1">{LABEL[id]}</td>
             <td className="num py-1">
-              {sample.nodes[id].busy} / {NODES[id].concurrency}
-              {sample.nodes[id].busy >= NODES[id].concurrency ? " (full)" : ""}
+              {sample.nodes[id].busy} / {scenario.nodes[id].concurrency}
+              {sample.nodes[id].busy >= scenario.nodes[id].concurrency ? " (full)" : ""}
             </td>
             <td className="num py-1">
-              {sample.nodes[id].queue} / {NODES[id].queueCapacity}
-              {NODES[id].queueCapacity > 0 && sample.nodes[id].queue >= NODES[id].queueCapacity ? " (full)" : ""}
+              {sample.nodes[id].queue} / {scenario.nodes[id].queueCapacity}
+              {scenario.nodes[id].queueCapacity > 0 && sample.nodes[id].queue >= scenario.nodes[id].queueCapacity ? " (full)" : ""}
             </td>
           </tr>
         ))}

@@ -35,7 +35,7 @@ function ToolBody({ name, args, data }: { name: string; args: Json; data: Json }
     return (
       <>
         <p className="text-xs text-muted">
-          {args.paymentSlowdown === 20 ? "Payment 20× slower" : "Healthy"} · seed {String(args.seed)} · {describeKnobs(knobs)}
+          {args.paymentSlowdown === 1 ? "Healthy" : `Payment ${String(args.paymentSlowdown)}× slower`} · seed {String(args.seed)} · {describeKnobs(knobs)}
         </p>
         <p className="num mt-1 text-xs">
           Error rate <b>{fmtRate(Number(m.errorRate))}</b> · degraded <b>{fmtRate(Number(m.degradedRate))}</b> · attempts/request <b>{Number(m.paymentAttemptsPerRequest).toFixed(2)}</b>

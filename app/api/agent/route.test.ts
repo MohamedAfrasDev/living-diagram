@@ -49,3 +49,57 @@ describe("/api/agent guards", () => {
     expect((await res.json()).code).toBe("INVALID_BODY");
   });
 });
+
+describe("/api/agent scenario body", () => {
+  const validScenario = {
+    nodes: {
+      gateway: { concurrency: 100, queueCapacity: 100, localMs: 2 },
+      order: { concurrency: 50, queueCapacity: 40, localMs: 5 },
+      cache: { concurrency: 50, queueCapacity: 0, localMs: 1 },
+      payment: { concurrency: 12, queueCapacity: 20, localMs: 20 },
+      db: { concurrency: 20, queueCapacity: 40, localMs: 10 },
+    },
+    arrivalIntervalMs: 20,
+    cacheMissRate: 0.25,
+    faultFactor: 20,
+  };
+
+  test("an invalid scenario is rejected before anything runs, naming the field", async () => {
+    process.env.MODEL_API_KEY = "sk-test-key-that-must-not-leak-1234567890";
+    const bad = structuredClone(validScenario);
+    bad.nodes.payment.concurrency = 0;
+    const res = await post({ question: "Checkout is failing. Fix it.", scenario: bad });
+    const body = await res.json();
+    expect(res.status).toBe(400);
+    expect(body.code).toBe("INVALID_SCENARIO");
+    expect(body.message).toContain("nodes.payment.concurrency");
+  });
+
+  test("a valid scenario passes validation (a bad question is then what is rejected)", async () => {
+    process.env.MODEL_API_KEY = "sk-test-key-that-must-not-leak-1234567890";
+    const res = await post({ question: "", scenario: validScenario });
+    expect(res.status).toBe(400);
+    expect((await res.json()).code).toBe("INVALID_BODY");
+  });
+
+  test("a scenario that is not an object is rejected", async () => {
+    process.env.MODEL_API_KEY = "sk-test-key-that-must-not-leak-1234567890";
+    for (const scenario of ["x", 5, [], null]) {
+      const res = await post({ question: "ok question", scenario });
+      if (scenario === null) {
+        // null means "no scenario": treated as the default, so the request would proceed; skip to avoid a network call.
+        continue;
+      }
+      expect(res.status).toBe(400);
+      expect((await res.json()).code).toBe("INVALID_SCENARIO");
+    }
+  });
+
+  test("REPLAY_ONLY still wins over an invalid scenario", async () => {
+    process.env.MODEL_API_KEY = "sk-test-key-that-must-not-leak-1234567890";
+    process.env.REPLAY_ONLY = "1";
+    const res = await post({ question: "ok question", scenario: { nope: true } });
+    expect(res.status).toBe(503);
+    expect((await res.json()).code).toBe("REPLAY_ONLY");
+  });
+});

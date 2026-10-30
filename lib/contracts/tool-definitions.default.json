@@ -1,0 +1,432 @@
+[
+  {
+    "type": "function",
+    "name": "simulate",
+    "description": "Run the deterministic simulator once with the given knobs and seed. paymentSlowdown is 1 (healthy) or 20 (payment 20x slower). Returns a run id and headline metrics recorded by the engine.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "knobs": {
+          "type": "object",
+          "properties": {
+            "timeoutMs": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 5000
+            },
+            "retries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "circuitBreaker": {
+              "type": "boolean"
+            },
+            "bulkhead": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "timeoutMs",
+            "retries",
+            "circuitBreaker",
+            "bulkhead"
+          ],
+          "additionalProperties": false
+        },
+        "paymentSlowdown": {
+          "type": "integer",
+          "enum": [
+            1,
+            20
+          ]
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "knobs",
+        "paymentSlowdown",
+        "seed"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "get_metrics",
+    "description": "Return recorded metric values for a run, for example errorRate, paymentAttemptsPerRequest, latencyMs.p95, nodes.order.occupiedSlotFraction. An empty paths array returns every available path.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "runId",
+        "paths"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "get_trace",
+    "description": "Return the recorded per-hop events (at most 60) for one logical request id (1 to 500) in a run.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "runId",
+        "requestId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "propose_patch",
+    "description": "Propose a change to the four knobs as typed operations. Returns the candidate knobs and a diff. It does not run anything; call simulate with the candidate to test it.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "baseKnobs": {
+          "type": "object",
+          "properties": {
+            "timeoutMs": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 5000
+            },
+            "retries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5
+            },
+            "circuitBreaker": {
+              "type": "boolean"
+            },
+            "bulkhead": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "timeoutMs",
+            "retries",
+            "circuitBreaker",
+            "bulkhead"
+          ],
+          "additionalProperties": false
+        },
+        "patch": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string",
+                "enum": [
+                  "timeoutMs",
+                  "retries",
+                  "circuitBreaker",
+                  "bulkhead"
+                ]
+              },
+              "value": {
+                "type": [
+                  "integer",
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "field",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "baseKnobs",
+        "patch"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "compare",
+    "description": "Compare two recorded runs. They must share the same seed, paymentSlowdown and engine version; only knob values may differ. Returns the knob diff and metric deltas (B minus A).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "runA": {
+          "type": "string"
+        },
+        "runB": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "runA",
+        "runB"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "type": "function",
+    "name": "conclude",
+    "description": "Finish the investigation. Every number you write in a claim or rejected proposal must be digits and must be listed in numbers with a reference to a recorded value: metric (path like run-2.errorRate), knob (a knob value of a recorded run), seed, ratio, or difference. Causal or directional wording (because, raised, lowered the error rate) needs a comparison of two runs you compared with the compare tool. Limits must contain no numbers. An empty claims array with limits is a valid insufficient-evidence answer. A blocked statement is not shown; fix it and call conclude again.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "numbers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "the number exactly as written in text, for example 91.8% or 3"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "metric",
+                        "knob",
+                        "seed",
+                        "ratio",
+                        "difference"
+                      ]
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "metric: run-2.errorRate"
+                    },
+                    "runId": {
+                      "type": "string",
+                      "description": "knob and seed: run-2"
+                    },
+                    "field": {
+                      "type": "string",
+                      "enum": [
+                        "timeoutMs",
+                        "retries",
+                        "circuitBreaker",
+                        "bulkhead"
+                      ],
+                      "description": "knob: which knob"
+                    },
+                    "numerator": {
+                      "type": "string",
+                      "description": "ratio: metric path"
+                    },
+                    "denominator": {
+                      "type": "string",
+                      "description": "ratio: metric path"
+                    },
+                    "from": {
+                      "type": "string",
+                      "description": "difference: metric path"
+                    },
+                    "to": {
+                      "type": "string",
+                      "description": "difference: metric path; value is to minus from"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "comparison": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "runA": {
+                        "type": "string"
+                      },
+                      "runB": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "runA",
+                      "runB"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "text",
+              "numbers",
+              "comparison"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "rejectedProposals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "numbers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "the number exactly as written in text, for example 91.8% or 3"
+                    },
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "metric",
+                        "knob",
+                        "seed",
+                        "ratio",
+                        "difference"
+                      ]
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "metric: run-2.errorRate"
+                    },
+                    "runId": {
+                      "type": "string",
+                      "description": "knob and seed: run-2"
+                    },
+                    "field": {
+                      "type": "string",
+                      "enum": [
+                        "timeoutMs",
+                        "retries",
+                        "circuitBreaker",
+                        "bulkhead"
+                      ],
+                      "description": "knob: which knob"
+                    },
+                    "numerator": {
+                      "type": "string",
+                      "description": "ratio: metric path"
+                    },
+                    "denominator": {
+                      "type": "string",
+                      "description": "ratio: metric path"
+                    },
+                    "from": {
+                      "type": "string",
+                      "description": "difference: metric path"
+                    },
+                    "to": {
+                      "type": "string",
+                      "description": "difference: metric path; value is to minus from"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "kind"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "comparison": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "runA": {
+                        "type": "string"
+                      },
+                      "runB": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "runA",
+                      "runB"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "text",
+              "numbers",
+              "comparison"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "limits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "claims",
+        "rejectedProposals",
+        "limits"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

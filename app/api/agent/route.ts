@@ -7,6 +7,7 @@ import { investigate, type TranscriptEntry } from "../../../lib/agent/loop";
 import { LIVE_AGENT_OFF_REASON, isReplayOnly } from "../../../lib/hosting";
 import { MetaProvider } from "../../../lib/agent/provider";
 import { ToolSession } from "../../../lib/agent/tools";
+import { validateScenario, type Scenario } from "../../../lib/engine/scenario";
 
 const MAX_QUESTION = 500;
 
@@ -23,20 +24,30 @@ export async function POST(request: Request) {
   if (!apiKey) return json({ code: "NO_API_KEY", message: "the agent is unavailable; use Replay mode" }, 503);
 
   let question: unknown;
+  let rawScenario: unknown;
   try {
     const body: unknown = await request.json();
-    question = typeof body === "object" && body !== null ? (body as { question?: unknown }).question : undefined;
+    const fields = typeof body === "object" && body !== null ? (body as { question?: unknown; scenario?: unknown }) : {};
+    question = fields.question;
+    rawScenario = fields.scenario;
   } catch {
     return json({ code: "INVALID_BODY", message: "expected a JSON body" }, 400);
   }
   if (typeof question !== "string" || question.trim().length === 0 || question.length > MAX_QUESTION) {
     return json({ code: "INVALID_BODY", message: `question must be 1 to ${MAX_QUESTION} characters` }, 400);
   }
+  // The scenario is the user's own numbers; absent or null means the template.
+  let scenario: Scenario | undefined;
+  if (rawScenario !== undefined && rawScenario !== null) {
+    const checked = validateScenario(rawScenario);
+    if (!checked.ok) return json({ code: "INVALID_SCENARIO", message: `${checked.field} ${checked.message}` }, 400);
+    scenario = checked.scenario;
+  }
   if (busy) return json({ code: "BUSY", message: "an investigation is already running" }, 429);
   busy = true;
 
   const encoder = new TextEncoder();
-  const session = new ToolSession();
+  const session = new ToolSession({ scenario });
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (value: unknown) => controller.enqueue(encoder.encode(JSON.stringify(value) + "\n"));

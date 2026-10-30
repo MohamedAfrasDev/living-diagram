@@ -1,7 +1,7 @@
 // Investigation loop (docs/03-agent-and-tools.md). The model acts only through
 // ToolSession; every provider failure ends visibly, never as a success.
-import { TOOL_DEFINITIONS, type ToolResult } from "../contracts/tools";
-import { SYSTEM_PROMPT } from "./prompt";
+import { toolDefinitions, type ToolResult } from "../contracts/tools";
+import { buildSystemPrompt } from "./prompt";
 import type { InputItem, Provider } from "./provider";
 import { ProviderError } from "./provider";
 import { ToolSession } from "./tools";
@@ -53,6 +53,10 @@ export async function investigate(options: InvestigateOptions): Promise<Investig
     transcript.push(entry);
     onEntry?.(entry);
   };
+  // Built from the session's scenario; for the default scenario these are the
+  // exact prompt and tool schemas the agent evaluation was run with.
+  const instructions = buildSystemPrompt(session.scenario);
+  const tools = toolDefinitions(session.scenario);
   const input: InputItem[] = [{ role: "user", content: question }];
   record({ kind: "user", text: question });
 
@@ -70,7 +74,7 @@ export async function investigate(options: InvestigateOptions): Promise<Investig
     turns++;
     let reply;
     try {
-      reply = await provider.respond({ instructions: SYSTEM_PROMPT, input: [...input], tools: TOOL_DEFINITIONS }, signal);
+      reply = await provider.respond({ instructions: instructions, input: [...input], tools: tools }, signal);
     } catch (e) {
       if (signal?.aborted) return finish("cancelled", "the investigation was cancelled");
       const message = e instanceof ProviderError ? e.message : "the model provider failed";
