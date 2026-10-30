@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest";
 import { DEFAULT_SCENARIO, type Scenario } from "../engine/scenario";
 import { SYSTEM_PROMPT, buildSystemPrompt } from "./prompt";
 
-const fixture = readFileSync("lib/agent/prompt.default.txt", "utf-8");
+// A Windows checkout may convert line endings; the prompt itself is LF only.
+const fixture = readFileSync("lib/agent/prompt.default.txt", "utf-8").split(String.fromCharCode(13, 10)).join(String.fromCharCode(10));
 
 const custom = (): Scenario => {
   const s = structuredClone(DEFAULT_SCENARIO) as unknown as {

@@ -139,7 +139,9 @@ describe("the loop gives the model the session's scenario", () => {
   test("with the default scenario the prompt and tools are the saved defaults", async () => {
     const provider = new Capture();
     await investigate({ question: "q", provider });
-    expect(provider.requests[0].instructions).toBe(readFileSync("lib/agent/prompt.default.txt", "utf-8"));
+    // A Windows checkout may convert line endings; the prompt itself is LF only.
+    const saved = readFileSync("lib/agent/prompt.default.txt", "utf-8").split(String.fromCharCode(13, 10)).join(String.fromCharCode(10));
+    expect(provider.requests[0].instructions).toBe(saved);
     expect(JSON.parse(JSON.stringify(provider.requests[0].tools))).toEqual(fixture);
   });
 });
