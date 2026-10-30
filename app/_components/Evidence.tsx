@@ -178,7 +178,11 @@ export function Evidence({
 
       <div className="mt-3 rounded-md border border-warn/40 bg-warn/5 p-2.5 text-xs">
         <p className="font-semibold text-warn">Scope</p>
-        <p className="mt-0.5">These numbers describe a template model with assumed capacities and service times, not your system. Measure real latency and capacity before using them to make a capacity decision.</p>
+        <p className="mt-0.5">
+          {isDefaultScenario(selectedRun.scenario)
+            ? "These numbers describe a template model with assumed capacities and service times, not your system. Measure real latency and capacity before using them to make a capacity decision."
+            : "These results hold for the numbers you entered, run on a simplified model of five services. The engine does not measure those numbers and this is not your real system. Measure real latency and capacity before using them to make a capacity decision."}
+        </p>
       </div>
       <p className="num mt-2 break-all text-[10px] text-muted">run hash {selected.runHash}</p>
     </Card>

@@ -286,7 +286,7 @@ export function Workspace() {
             </Badge>
           ) : null}
           {LIVE_DISABLED_REASON ? <Badge tone="replay" title={LIVE_DISABLED_REASON}>Hosted replay copy</Badge> : null}
-          <Badge title="Virtual time and template parameters">Template model</Badge>
+          <Badge title="Virtual time. The numbers are the template values or numbers you entered, never measurements.">Simulated model</Badge>
         </div>
       </header>
 
@@ -352,7 +352,7 @@ export function Workspace() {
       </main>
 
       <footer className="mt-6 border-t border-border pt-3 text-xs text-muted">
-        Muse Spark drives the experiments through typed tools; the engine is the only source of numbers. Results describe this template model, not a real system.
+        Muse Spark drives the experiments through typed tools; the engine is the only source of numbers. Results describe a simplified model on the numbers shown (the template, or numbers you entered), not a real system.
       </footer>
     </div>
   );
