@@ -4,15 +4,13 @@
 // answers 503 NO_API_KEY so the UI can switch to labeled Replay mode. With
 // REPLAY_ONLY=1 it answers 503 REPLAY_ONLY before looking at anything else.
 import { investigate, type TranscriptEntry } from "../../../lib/agent/loop";
+import { release, tryAcquire } from "../../../lib/busy";
 import { LIVE_AGENT_OFF_REASON, isReplayOnly } from "../../../lib/hosting";
 import { MetaProvider } from "../../../lib/agent/provider";
 import { ToolSession } from "../../../lib/agent/tools";
 import { validateScenario, type Scenario } from "../../../lib/engine/scenario";
 
 const MAX_QUESTION = 500;
-
-// One investigation at a time protects the credit balance.
-let busy = false;
 
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -43,8 +41,8 @@ export async function POST(request: Request) {
     if (!checked.ok) return json({ code: "INVALID_SCENARIO", message: `${checked.field} ${checked.message}` }, 400);
     scenario = checked.scenario;
   }
-  if (busy) return json({ code: "BUSY", message: "an investigation is already running" }, 429);
-  busy = true;
+  // One model request at a time (shared with /api/extract) protects the credit balance.
+  if (!tryAcquire()) return json({ code: "BUSY", message: "an investigation is already running" }, 429);
 
   const encoder = new TextEncoder();
   const session = new ToolSession({ scenario });
@@ -71,7 +69,7 @@ export async function POST(request: Request) {
       } catch {
         send({ kind: "outcome", status: "provider_unavailable", detail: "the investigation failed unexpectedly", turns: 0 });
       } finally {
-        busy = false;
+        release();
         controller.close();
       }
     },
