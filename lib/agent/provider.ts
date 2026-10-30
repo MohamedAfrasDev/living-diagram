@@ -21,10 +21,14 @@ export interface ModelTurn {
   text: string;
 }
 
+// Same shape as ToolDefinition with any tool name, so a non-agent caller (the
+// extraction route) can offer its own single tool.
+export type ProviderTool = Omit<ToolDefinition, "name"> & { name: string };
+
 export interface ProviderRequest {
   instructions: string;
   input: InputItem[];
-  tools: ToolDefinition[];
+  tools: ProviderTool[];
 }
 
 export interface Provider {

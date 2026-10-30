@@ -2,6 +2,7 @@
 // and the UI (docs/03-agent-and-tools.md). Arguments are validated here and
 // rejected, never guessed: unknown tools, unknown fields and bad values all
 // return a named error.
+import { DEFAULT_SCENARIO, arrivalCount, type Scenario } from "../engine/scenario";
 import { knobsError, type Knobs } from "../engine/simulate";
 import type { ConcludeArgs, NumberRef, Statement } from "./claims";
 
@@ -36,7 +37,8 @@ export type KnobField = (typeof KNOB_FIELDS)[number];
 
 export interface SimulateArgs {
   knobs: Knobs;
-  paymentSlowdown: 1 | 20;
+  // 1 (healthy) or the scenario's fault factor.
+  paymentSlowdown: number;
   seed: number;
 }
 export interface GetMetricsArgs {
@@ -107,13 +109,15 @@ export function parseKnobs(value: unknown, label = "knobs"): Parsed<Knobs> {
   return { ok: true, value: knobs };
 }
 
-export function parseSimulateArgs(args: unknown): Parsed<SimulateArgs> {
+export function parseSimulateArgs(args: unknown, scenario: Scenario = DEFAULT_SCENARIO): Parsed<SimulateArgs> {
   const obj = exactObject(args, ["knobs", "paymentSlowdown", "seed"], "simulate args");
   if (!obj.ok) return obj;
   const { knobs, paymentSlowdown, seed } = obj.value;
   if (typeof seed !== "number" || !Number.isInteger(seed)) return fail("INVALID_ARGS", "seed must be an integer");
   if (typeof paymentSlowdown !== "number") return fail("INVALID_ARGS", "paymentSlowdown must be a number");
-  if (paymentSlowdown !== 1 && paymentSlowdown !== 20) return fail("INVALID_FAULT", "paymentSlowdown must be 1 or 20");
+  if (paymentSlowdown !== 1 && paymentSlowdown !== scenario.faultFactor) {
+    return fail("INVALID_FAULT", `paymentSlowdown must be 1 or ${scenario.faultFactor}`);
+  }
   const parsed = parseKnobs(knobs);
   if (!parsed.ok) return parsed;
   return { ok: true, value: { knobs: parsed.value, paymentSlowdown, seed } };
@@ -323,15 +327,22 @@ const statementSchema = {
   additionalProperties: false,
 };
 
-export const TOOL_DEFINITIONS: ToolDefinition[] = [
+// The tool schemas for a scenario: paymentSlowdown is limited to 1 or the
+// scenario's fault factor, and request ids to the offered count. For the
+// default scenario the result is identical to the definitions the agent
+// evaluation (doc 07) was run with.
+export function toolDefinitions(scenario: Scenario = DEFAULT_SCENARIO): ToolDefinition[] {
+  const factor = scenario.faultFactor;
+  const requests = arrivalCount(scenario);
+  return [
   {
     type: "function",
     name: "simulate",
     description:
-      "Run the deterministic simulator once with the given knobs and seed. paymentSlowdown is 1 (healthy) or 20 (payment 20x slower). Returns a run id and headline metrics recorded by the engine.",
+      `Run the deterministic simulator once with the given knobs and seed. paymentSlowdown is 1 (healthy) or ${factor} (payment ${factor}x slower). Returns a run id and headline metrics recorded by the engine.`,
     parameters: {
       type: "object",
-      properties: { knobs: knobsSchema, paymentSlowdown: { type: "integer", enum: [1, 20] }, seed: { type: "integer" } },
+      properties: { knobs: knobsSchema, paymentSlowdown: { type: "integer", enum: [1, factor] }, seed: { type: "integer" } },
       required: ["knobs", "paymentSlowdown", "seed"],
       additionalProperties: false,
     },
@@ -351,10 +362,10 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     type: "function",
     name: "get_trace",
-    description: "Return the recorded per-hop events (at most 60) for one logical request id (1 to 500) in a run.",
+    description: `Return the recorded per-hop events (at most 60) for one logical request id (1 to ${requests}) in a run.`,
     parameters: {
       type: "object",
-      properties: { runId: { type: "string" }, requestId: { type: "integer", minimum: 1, maximum: 500 } },
+      properties: { runId: { type: "string" }, requestId: { type: "integer", minimum: 1, maximum: requests } },
       required: ["runId", "requestId"],
       additionalProperties: false,
     },
@@ -414,4 +425,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
       additionalProperties: false,
     },
   },
-];
+  ];
+}
+
+export const TOOL_DEFINITIONS: ToolDefinition[] = toolDefinitions(DEFAULT_SCENARIO);

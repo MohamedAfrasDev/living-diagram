@@ -17,8 +17,8 @@ import {
   type ToolName,
   type ToolResult,
 } from "../contracts/tools";
-import { ARRIVAL_COUNT } from "../engine/scenario";
-import { simulate, type EngineEvent, type Knobs, type SimulationResult } from "../engine/simulate";
+import { DEFAULT_SCENARIO, arrivalCount, validateScenario, type Scenario } from "../engine/scenario";
+import { EngineError, simulate, type EngineEvent, type Knobs, type SimulationResult } from "../engine/simulate";
 import { checkLimit, checkStatement, type Evidence } from "./claims";
 import { flattenMetrics, HEADLINE_PATHS, type MetricValue } from "./metrics";
 
@@ -30,7 +30,7 @@ const MAX_TRACE_EVENTS = 60;
 export interface StoredRun {
   runId: string;
   seed: number;
-  paymentSlowdown: 1 | 20;
+  paymentSlowdown: number;
   knobs: Knobs;
   result: SimulationResult;
   metrics: Record<string, MetricValue>;
@@ -45,6 +45,8 @@ export interface LoggedCall {
 export interface ToolSessionOptions {
   maxSimulations?: number;
   maxToolCalls?: number;
+  // The numbers to run on; defaults to the template scenario.
+  scenario?: Scenario;
 }
 
 const err = (code: ToolErrorCode, message: string, details?: unknown): { ok: false; error: ToolError } => ({
@@ -64,11 +66,19 @@ export class ToolSession implements Evidence {
   private simulations = 0;
   readonly maxSimulations: number;
   readonly maxToolCalls: number;
+  readonly scenario: Scenario;
   private concludeAttempts = 0;
 
   constructor(options: ToolSessionOptions = {}) {
     this.maxSimulations = options.maxSimulations ?? MAX_SIMULATIONS;
     this.maxToolCalls = options.maxToolCalls ?? MAX_TOOL_CALLS;
+    if (options.scenario === undefined) {
+      this.scenario = DEFAULT_SCENARIO;
+    } else {
+      const checked = validateScenario(options.scenario);
+      if (!checked.ok) throw new EngineError("INVALID_SCENARIO", `${checked.field} ${checked.message}`);
+      this.scenario = checked.scenario;
+    }
   }
 
   get usage(): { toolCalls: number; simulations: number } {
@@ -123,14 +133,14 @@ export class ToolSession implements Evidence {
   }
 
   private simulateTool(args: unknown): ToolResult<unknown> {
-    const parsed = parseSimulateArgs(args);
+    const parsed = parseSimulateArgs(args, this.scenario);
     if (!parsed.ok) return parsed;
     if (this.simulations >= this.maxSimulations) {
       return err("BUDGET_EXCEEDED", `simulation budget of ${this.maxSimulations} is used`);
     }
     this.simulations++;
     const { knobs, paymentSlowdown, seed } = parsed.value;
-    const result = simulate({ seed, knobs, paymentSlowdown, recordEvents: true });
+    const result = simulate({ seed, knobs, paymentSlowdown, scenario: this.scenario, recordEvents: true });
     if (result.status !== "complete") {
       return err("RUN_INCOMPLETE", "the run exceeded its event budget; its results are not ranked");
     }
@@ -165,8 +175,9 @@ export class ToolSession implements Evidence {
     const run = this.runs.get(parsed.value.runId);
     if (!run) return err("UNKNOWN_RUN", `unknown run "${parsed.value.runId}"`);
     const { requestId } = parsed.value;
-    if (!Number.isInteger(requestId) || requestId < 1 || requestId > ARRIVAL_COUNT) {
-      return err("UNKNOWN_REQUEST", `requestId must be an integer from 1 to ${ARRIVAL_COUNT}`);
+    const offered = arrivalCount(this.scenario);
+    if (!Number.isInteger(requestId) || requestId < 1 || requestId > offered) {
+      return err("UNKNOWN_REQUEST", `requestId must be an integer from 1 to ${offered}`);
     }
     const all: EngineEvent[] = (run.result.events ?? []).filter((e) => e.requestId === requestId);
     const events = all.slice(0, MAX_TRACE_EVENTS).map((e) => ({
@@ -185,7 +196,7 @@ export class ToolSession implements Evidence {
     const candidate: Record<string, number | boolean | null> = { ...baseKnobs };
     for (const op of patch) candidate[op.field] = op.value;
     // Re-validate the whole candidate through the same parser as simulate.
-    const check = parseSimulateArgs({ knobs: candidate, paymentSlowdown: 1, seed: 0 });
+    const check = parseSimulateArgs({ knobs: candidate, paymentSlowdown: 1, seed: 0 }, this.scenario);
     if (!check.ok) return check;
     const diff = KNOB_FIELDS.flatMap((field) =>
       candidate[field] === baseKnobs[field] ? [] : [{ field, from: baseKnobs[field], to: candidate[field] }],

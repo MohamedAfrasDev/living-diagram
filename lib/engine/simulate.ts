@@ -3,20 +3,22 @@
 // model calls, no wall clock, never imports the agent package.
 import { fnv1a, mulberry32 } from "./rng";
 import {
-  ARRIVAL_COUNT,
-  ARRIVAL_INTERVAL_MS,
   BREAKER_FAILURE_THRESHOLD,
   BREAKER_OPEN_MS,
-  CACHE_MISS_RATE,
   COMPLETION_RANK,
+  DEFAULT_SCENARIO,
   ENGINE_VERSION,
   HORIZON_MS,
   KNOB_DOMAIN,
   MAX_EVENTS,
   NODE_IDS,
-  NODES,
   RETRY_BACKOFF_MS,
+  arrivalCount,
+  canonicalScenario,
+  isDefaultScenario,
+  validateScenario,
   type NodeId,
+  type Scenario,
 } from "./scenario";
 
 export interface Knobs {
@@ -27,7 +29,7 @@ export interface Knobs {
 }
 
 export type FailureCode = "QUEUE_FULL" | "TIMEOUT" | "BULKHEAD_FULL";
-export type EngineErrorCode = "INVALID_KNOBS" | "INVALID_FAULT";
+export type EngineErrorCode = "INVALID_KNOBS" | "INVALID_FAULT" | "INVALID_SCENARIO";
 
 export class EngineError extends Error {
   readonly code: EngineErrorCode;
@@ -42,6 +44,8 @@ export interface SimulateInput {
   seed: number;
   knobs: Knobs;
   paymentSlowdown: number;
+  // The numbers to run on. Defaults to the template (DEFAULT_SCENARIO).
+  scenario?: Scenario;
   recordEvents?: boolean;
   // Sample node occupancy every TIMELINE_STEP_MS for the canvas. Display only:
   // it is not part of the run hash and is never returned by an agent tool.
@@ -170,14 +174,22 @@ export function knobsError(knobs: Knobs): string | null {
   return null;
 }
 
-function validate(input: SimulateInput): void {
+// Validates the input and returns the scenario to run on.
+function validate(input: SimulateInput): Scenario {
   const { knobs, paymentSlowdown, seed } = input;
   if (!isInt(seed)) throw new EngineError("INVALID_KNOBS", "seed must be an integer");
   const message = knobsError(knobs);
   if (message) throw new EngineError("INVALID_KNOBS", message);
-  if (paymentSlowdown !== 1 && paymentSlowdown !== 20) {
-    throw new EngineError("INVALID_FAULT", "paymentSlowdown must be 1 or 20");
+  let scenario = DEFAULT_SCENARIO;
+  if (input.scenario !== undefined) {
+    const checked = validateScenario(input.scenario);
+    if (!checked.ok) throw new EngineError("INVALID_SCENARIO", `${checked.field} ${checked.message}`);
+    scenario = checked.scenario;
   }
+  if (paymentSlowdown !== 1 && paymentSlowdown !== scenario.faultFactor) {
+    throw new EngineError("INVALID_FAULT", `paymentSlowdown must be 1 or ${scenario.faultFactor}`);
+  }
+  return scenario;
 }
 
 function program(v: Visit): Action[] {
@@ -196,8 +208,9 @@ function program(v: Visit): Action[] {
 }
 
 export function simulate(input: SimulateInput): SimulationResult {
-  validate(input);
+  const sc = validate(input);
   const { knobs, paymentSlowdown, seed } = input;
+  const offeredCount = arrivalCount(sc);
   const horizon = HORIZON_MS;
   const rng = mulberry32(seed);
   const events: EngineEvent[] | null = input.recordEvents ? [] : null;
@@ -247,7 +260,7 @@ export function simulate(input: SimulateInput): SimulationResult {
     n.busy++;
     v.holdsSlot = true;
     const slowdown = v.node === "payment" ? paymentSlowdown : 1;
-    v.finishAt = t + NODES[v.node].localMs * slowdown;
+    v.finishAt = t + sc.nodes[v.node].localMs * slowdown;
     push(completions, v.finishAt, v);
     ev("start", v, v.node);
   };
@@ -256,7 +269,7 @@ export function simulate(input: SimulateInput): SimulationResult {
     const n = ns[v.node];
     n.busy--;
     v.holdsSlot = false;
-    while (n.busy < NODES[v.node].concurrency && n.queue.length > 0) {
+    while (n.busy < sc.nodes[v.node].concurrency && n.queue.length > 0) {
       const next = n.queue.shift();
       if (next) start(next);
     }
@@ -334,7 +347,7 @@ export function simulate(input: SimulateInput): SimulationResult {
       attemptsUsed: 0,
       holdsSlot: false,
     };
-    const spec = NODES[node];
+    const spec = sc.nodes[node];
     const n = ns[node];
     if (n.busy < spec.concurrency) {
       start(v);
@@ -457,11 +470,11 @@ export function simulate(input: SimulateInput): SimulationResult {
     }
 
     // 4. New arrivals at the gateway.
-    if (t % ARRIVAL_INTERVAL_MS === 0 && t / ARRIVAL_INTERVAL_MS < ARRIVAL_COUNT) {
+    if (t % sc.arrivalIntervalMs === 0 && t / sc.arrivalIntervalMs < offeredCount) {
       const req: Request = {
-        id: t / ARRIVAL_INTERVAL_MS + 1,
+        id: t / sc.arrivalIntervalMs + 1,
         arrivalMs: t,
-        cacheMiss: rng() < CACHE_MISS_RATE,
+        cacheMiss: rng() < sc.cacheMissRate,
         settled: false,
       };
       ev("arrive", null, "gateway");
@@ -494,7 +507,7 @@ export function simulate(input: SimulateInput): SimulationResult {
     }
   }
 
-  const offered = ARRIVAL_COUNT;
+  const offered = offeredCount;
   const settled = succeeded + degraded + failed;
   const sorted = [...latencies].sort((a, b) => a - b);
   const percentile = (p: number): number | null =>
@@ -504,7 +517,7 @@ export function simulate(input: SimulateInput): SimulationResult {
     NODE_IDS.map((id) => [
       id,
       {
-        occupiedSlotFraction: ns[id].busySlotMs / (NODES[id].concurrency * horizon),
+        occupiedSlotFraction: ns[id].busySlotMs / (sc.nodes[id].concurrency * horizon),
         timeWeightedQueueDepth: ns[id].queueMs / horizon,
         peakQueue: ns[id].peakQueue,
         rejected: ns[id].rejected,
@@ -532,7 +545,12 @@ export function simulate(input: SimulateInput): SimulationResult {
     paymentAttemptsPerRequest: paymentAttempts / offered,
     nodes,
   };
-  const result: SimulationResult = { ...body, runHash: fnv1a(JSON.stringify({ seed, knobs, paymentSlowdown, body })) };
+  // The default scenario hashes exactly as it always has, so every recorded
+  // result stays valid; any other scenario is part of the hashed input.
+  const hashed = isDefaultScenario(sc)
+    ? JSON.stringify({ seed, knobs, paymentSlowdown, body })
+    : JSON.stringify({ seed, knobs, paymentSlowdown, scenario: canonicalScenario(sc), body });
+  const result: SimulationResult = { ...body, runHash: fnv1a(hashed) };
   if (events) result.events = events;
   if (timeline) result.timeline = timeline;
   return result;

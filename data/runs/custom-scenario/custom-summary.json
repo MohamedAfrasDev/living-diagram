@@ -1,0 +1,100 @@
+{
+  "summary": {
+    "runs": 3,
+    "validCalls": 3,
+    "confirmedFix": 3,
+    "selfCorrected": 0,
+    "unsupportedNumbers": 0,
+    "unverifiableNumbers": 0,
+    "blockedStatements": 0,
+    "bars": "none: exploratory, every miss reported"
+  },
+  "rows": [
+    {
+      "run": 1,
+      "prompt": "Checkout is failing because payment is slow. Find a fix and show me the evidence.",
+      "status": "complete",
+      "detail": "concluded with 3 checked claim(s)",
+      "turns": 9,
+      "usage": {
+        "toolCalls": 11,
+        "simulations": 6
+      },
+      "validCalls": true,
+      "rejectedByCode": {},
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 3,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "healthyBaselineErrorRate": 0,
+      "limitsSayUserNumbers": true,
+      "toolCalls": 12,
+      "seconds": 85
+    },
+    {
+      "run": 2,
+      "prompt": "Payment latency spiked. Should I turn on a circuit breaker, add a bulkhead, or tune the timeout? Evaluate and recommend.",
+      "status": "complete",
+      "detail": "concluded with 2 checked claim(s)",
+      "turns": 9,
+      "usage": {
+        "toolCalls": 11,
+        "simulations": 8
+      },
+      "validCalls": true,
+      "rejectedByCode": {},
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 2,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "healthyBaselineErrorRate": 0,
+      "limitsSayUserNumbers": true,
+      "toolCalls": 12,
+      "seconds": 186
+    },
+    {
+      "run": 3,
+      "prompt": "Checkout error rates are high. Do not assume anything: find out why, and whether a config change can fix it, or tell me honestly if you cannot.",
+      "status": "complete",
+      "detail": "concluded with 4 checked claim(s)",
+      "turns": 15,
+      "usage": {
+        "toolCalls": 16,
+        "simulations": 6
+      },
+      "validCalls": true,
+      "rejectedByCode": {
+        "UNKNOWN_FIELD": 1
+      },
+      "confirmed": true,
+      "why": "fix [1000,0,true,null]: seeds passing 1,2; healthy undegraded true; degraded reported true",
+      "selfCorrected": false,
+      "blockedStatements": 0,
+      "claims": 4,
+      "unsupported": 0,
+      "unverifiable": 0,
+      "seedsUsed": [
+        1,
+        2
+      ],
+      "healthyBaselineErrorRate": 0,
+      "limitsSayUserNumbers": true,
+      "toolCalls": 18,
+      "seconds": 180
+    }
+  ]
+}

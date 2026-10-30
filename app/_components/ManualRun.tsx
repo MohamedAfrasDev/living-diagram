@@ -4,11 +4,13 @@
 // agent or an API key. Invalid values disable the run button and say why (rule 6).
 import { useState } from "react";
 import { KNOB_DOMAIN } from "@/lib/engine/scenario";
+import type { Scenario } from "@/lib/engine/scenario";
 import { knobsError, type Knobs } from "@/lib/engine/simulate";
 import { DEFAULT_KNOBS } from "@/lib/ui/runs";
 import { Button, Card } from "./ui";
 
-export function ManualRun({ onRun }: { onRun: (knobs: Knobs, paymentSlowdown: 1 | 20, seed: number) => void }) {
+// `scenario` is the current valid numbers, or null while Your numbers is invalid.
+export function ManualRun({ scenario, onRun }: { scenario: Scenario | null; onRun: (knobs: Knobs, paymentSlowdown: number, seed: number) => void }) {
   const [timeoutMs, setTimeoutMs] = useState(String(DEFAULT_KNOBS.timeoutMs));
   const [retries, setRetries] = useState(String(DEFAULT_KNOBS.retries));
   const [breaker, setBreaker] = useState(false);
@@ -23,7 +25,7 @@ export function ManualRun({ onRun }: { onRun: (knobs: Knobs, paymentSlowdown: 1 
     bulkhead: bulkhead === "" ? null : Number(bulkhead),
   };
   const seedNumber = Number(seed);
-  const error = !Number.isInteger(seedNumber) || seed.trim() === "" ? "seed must be an integer" : knobsError(knobs);
+  const error = scenario === null ? "fix Your numbers first" : !Number.isInteger(seedNumber) || seed.trim() === "" ? "seed must be an integer" : knobsError(knobs);
   const field = "mt-0.5 w-full rounded-md border border-border bg-surface px-2 py-1.5 text-sm";
 
   return (
@@ -31,7 +33,7 @@ export function ManualRun({ onRun }: { onRun: (knobs: Knobs, paymentSlowdown: 1 
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (!error) onRun(knobs, fault ? 20 : 1, seedNumber);
+          if (!error && scenario) onRun(knobs, fault ? scenario.faultFactor : 1, seedNumber);
         }}
         className="space-y-3"
       >
@@ -73,7 +75,7 @@ export function ManualRun({ onRun }: { onRun: (knobs: Knobs, paymentSlowdown: 1 
           </label>
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={fault} onChange={(e) => setFault(e.target.checked)} className="accent-[var(--accent)]" />
-            Payment 20× slower
+            Payment {scenario?.faultFactor ?? "…"}× slower
           </label>
         </div>
         <div className="flex flex-wrap items-center gap-3">

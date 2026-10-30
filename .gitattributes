@@ -1,0 +1,2 @@
+# Fixture compared byte for byte with the generated agent prompt (docs/10-your-numbers.md, G2).
+lib/agent/prompt.default.txt text eol=lf

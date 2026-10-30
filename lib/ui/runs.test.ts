@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest";
 import type { GoldenRun } from "../agent/replay";
 import { simulate } from "../engine/simulate";
 import { fmtCount, fmtMs, fmtRate, headlineRows } from "./format";
-import { DEFAULT_KNOBS, describeKnobs, extractRuns, runInput, sampleAt } from "./runs";
+import { DEFAULT_SCENARIO, type Scenario } from "../engine/scenario";
+import { DEFAULT_KNOBS, describeKnobs, extractRuns, runInput, sameNumbers, sampleAt } from "./runs";
 
 const golden = JSON.parse(readFileSync("public/golden/slow-payment-run-1.json", "utf-8")) as GoldenRun;
 
@@ -68,5 +69,40 @@ describe("format", () => {
     const keys = rows.map((r) => r.key);
     expect(keys.indexOf("degradedRate")).toBe(keys.indexOf("errorRate") + 1);
     expect(rows.find((r) => r.key === "errorRate")?.value).toBeGreaterThan(0.2);
+  });
+});
+
+describe("runs carry the numbers they were run on", () => {
+  const custom = (() => {
+    const c = structuredClone(DEFAULT_SCENARIO) as unknown as { nodes: { payment: { concurrency: number } } };
+    c.nodes.payment.concurrency = 14;
+    return c as unknown as Scenario;
+  })();
+
+  test("transcript runs default to the template numbers", () => {
+    for (const r of extractRuns(golden.entries)) expect(r.scenario).toEqual(DEFAULT_SCENARIO);
+  });
+
+  test("a transcript read with another scenario binds every run to it", () => {
+    // The recorded calls use fault factor 20, which this scenario keeps.
+    const runs = extractRuns(golden.entries, custom);
+    expect(runs.length).toBe(golden.outcome.usage.simulations);
+    for (const r of runs) expect(r.scenario.nodes.payment.concurrency).toBe(14);
+  });
+
+  test("runInput includes the scenario, so re-running reproduces the run", () => {
+    const [first] = extractRuns(golden.entries, custom);
+    const input = runInput(first);
+    expect(input.scenario?.nodes.payment.concurrency).toBe(14);
+    expect(simulate(input).runHash).not.toBe(simulate(runInput(extractRuns(golden.entries)[0])).runHash);
+  });
+
+  test("only runs on the same numbers are comparable", () => {
+    const a = extractRuns(golden.entries)[0];
+    const b = extractRuns(golden.entries)[1];
+    const c = extractRuns(golden.entries, custom)[0];
+    expect(sameNumbers(a, b)).toBe(true);
+    expect(sameNumbers(a, c)).toBe(false);
+    expect(sameNumbers({ ...a, scenario: structuredClone(a.scenario) as Scenario }, a)).toBe(true);
   });
 });

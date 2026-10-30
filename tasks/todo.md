@@ -42,7 +42,29 @@ Checkpoint: slow-payment investigation completes with no unsupported number reac
 - [ ] T19: Clean-clone run from README only. Done without a key (2026-10-29); still to do with a key, and again after the final commit
 - [ ] T20: 3-tester check (protocol written, doc 07 section 4; testers not yet recruited or run)
 - [ ] T21: 3-minute video from real output, replay segments labeled (script written: docs/08-demo-script.md; Afras records; two blanks: opening story, tester result)
-- [x] T22a: Hosted replay-only guard built and tested (D-032 step 1). [ ] T22b: push to the public `main` and deploy, waiting for Afras's go
+- [x] T22a: Hosted replay-only guard built and tested (D-032 step 1). T22b (part): PR #2 merged into `main` and `main` verified from a fresh clone (D-035). [ ] Deploy the hosted replay copy: waiting for Afras's go (D-032)
 - [ ] T22: Secrets check, repo public, X post (optional), submission text, submit before Nov 4, 9 PM ET; open it as a judge would
 
 Cut order if behind: evidence export, second scenario, extra testers, panel polish. Never cut the golden test, claim checker, a live engine run, or the Replay label.
+
+## Phase 5: Your numbers (option B, proposed D-037; build only after approval)
+
+- [x] T23: Fixtures (72 default run hashes, default prompt, default tool definitions) and failing tests for G1 to G6: done
+- [x] T24: Engine reads a Scenario; default results bit-exact; G1, G3, G4, G5: done
+- [x] T25: Tools, contracts, prompt builder, route accept a scenario; G2, G6: done
+- [x] T26: UI: Your numbers card, per-run scenario, canvas and evidence read the run's numbers, comparison rule: done
+- [x] T27: Browser checks (light, dark, phone) found and fixed a result-cache bug (D-038); 3 live agent runs on custom numbers, exploratory: done
+- [x] T28: Docs and wording (README, docs 06, 07, 08, 09, 10, decision log): done. Branch `your-numbers` is local only: not pushed, no PR
+
+Kill criteria: G1 not green by end of Oct 30 means option A; UI not done by end of Oct 31 means engine and manual panel only, or revert.
+
+## Phase 6: Fill from incident text (D-039 approved, built, D-040)
+
+Spec: `docs/11-incident-text.md`. Hard stop: end of Oct 31. Must not delay the video, tester check or hosted deploy.
+
+- [x] T29: Fixtures and failing tests for E1 to E6 (scripted provider; quote check, conversions, validation, conflict/absence, route guards)
+- [x] T30: Extraction module and `POST /api/extract`
+- [x] T31: Review table UI inside Your numbers; browser checks (E7)
+- [x] T32: 8-text extraction check written before running (E8); docs and wording
+
+Kill criteria: E1 to E6 not green by end of Oct 30 means drop the feature; UI not done by end of Oct 31 means do not merge.

@@ -43,8 +43,15 @@ Length: 397 spoken words without your two blanks (about 2:40 at 150 words a minu
 
 Only with a key, on the local machine, not on a hosted copy. Click **Ask the agent** on the default question and show the badge switch to **Live agent**, the Replay banner disappear, and steps stream in. Say what you see: "This is a fresh run by Muse Spark." Cut away before it finishes, or show the final status. If the live run takes a different path or hits a provider error, say so plainly. Never present the recording as the live run, and never present the live run as the recording.
 
+## Optional: a "Your numbers" moment (only if it fits)
+
+The script is built from the recorded run on the template numbers and already runs close to 3:00, so this is optional and would replace the live clip, not add to the length. If you use it, show it in about 15 seconds: open **Your numbers**, change Payment workers from 10 to 20, press **Run simulation**, and say what the screen shows (errors drop from 94.0% to 0.0% on those numbers). Say "numbers I entered", never "your system": it models a fixed five-service chain, you cannot add or rewire services.
+
+Likewise optional, only with a key and only if there are seconds to spare: **Fill from incident text** (paste two sentences, press **Read numbers**, show the quotes, press **Use these numbers**). Say "it reads the numbers out of text, with the sentence each came from, and I check them", never "it understands your incident".
+
 ## What not to say
 
+- Not that it "models your system" or lets you "draw your architecture": you can enter your own numbers for five fixed services, nothing more.
 - Not "the first" or "the only" tool, and nothing about real-world capacity, throughput or cost. The model is a template with virtual time.
 - Not that retries "make errors worse". In this model they do not raise the error rate (D-016); they multiply load and tail latency.
 - Not that the agent "learned", "self-corrected" or "reasoned its way past a wrong fix". It did not try a wrong fix first (0 of 12).

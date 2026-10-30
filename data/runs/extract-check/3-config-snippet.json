@@ -1,0 +1,83 @@
+{
+  "status": 200,
+  "body": {
+    "kind": "extraction",
+    "result": {
+      "fields": {
+        "gateway.concurrency": {
+          "state": "not_found"
+        },
+        "gateway.queueCapacity": {
+          "state": "not_found"
+        },
+        "gateway.localMs": {
+          "state": "not_found"
+        },
+        "order.concurrency": {
+          "state": "found",
+          "value": 40,
+          "quote": "workers: 40"
+        },
+        "order.queueCapacity": {
+          "state": "found",
+          "value": 40,
+          "quote": "queue_size: 40"
+        },
+        "order.localMs": {
+          "state": "not_found"
+        },
+        "cache.concurrency": {
+          "state": "not_found"
+        },
+        "cache.queueCapacity": {
+          "state": "not_found"
+        },
+        "cache.localMs": {
+          "state": "not_found"
+        },
+        "payment.concurrency": {
+          "state": "found",
+          "value": 16,
+          "quote": "workers: 16"
+        },
+        "payment.queueCapacity": {
+          "state": "found",
+          "value": 50,
+          "quote": "queue_size: 50"
+        },
+        "payment.localMs": {
+          "state": "found",
+          "value": 20,
+          "quote": "avg_handler_ms: 20"
+        },
+        "db.concurrency": {
+          "state": "not_found"
+        },
+        "db.queueCapacity": {
+          "state": "not_found"
+        },
+        "db.localMs": {
+          "state": "not_found"
+        },
+        "arrivalIntervalMs": {
+          "state": "converted",
+          "value": 33,
+          "quote": "# traffic peaked at 30 requests per second",
+          "raw": {
+            "value": 30,
+            "unit": "rps"
+          }
+        },
+        "cacheMissRate": {
+          "state": "not_found"
+        },
+        "faultFactor": {
+          "state": "not_found"
+        }
+      },
+      "unmapped": [
+        "client_timeout_ms: 1000 is a timeout, not per-request time"
+      ]
+    }
+  }
+}

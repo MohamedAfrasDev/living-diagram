@@ -3,10 +3,11 @@
 // The evidence panel: metrics for the selected run, optionally compared with
 // another run under matched conditions. Every value is read from an engine
 // result. errorRate and degradedRate always sit together (D-005).
-import { NODE_IDS } from "@/lib/engine/scenario";
+import { NODE_IDS, isDefaultScenario } from "@/lib/engine/scenario";
 import type { SimulationResult } from "@/lib/engine/simulate";
 import { fmtMs, fmtRate, headlineRows, type MetricRow } from "@/lib/ui/format";
-import { describeKnobs, type UiRun } from "@/lib/ui/runs";
+import { describeNumbers } from "@/lib/ui/numbers";
+import { describeKnobs, sameNumbers, type UiRun } from "@/lib/ui/runs";
 import { Badge, Card } from "./ui";
 
 const LABEL: Record<string, string> = { gateway: "Gateway", order: "Order", cache: "Cache", payment: "Payment", db: "DB" };
@@ -47,7 +48,7 @@ function RunSelect({ label, value, runs, none, onChange }: { label: string; valu
         {none ? <option value="">{none}</option> : null}
         {runs.map((r) => (
           <option key={r.id} value={r.id}>
-            {r.id} · {r.paymentSlowdown === 20 ? "fault" : "healthy"} · seed {r.seed} · {describeKnobs(r.knobs)}
+            {r.id} · {r.paymentSlowdown === 1 ? "healthy" : "fault"} · seed {r.seed} · {describeKnobs(r.knobs)}{isDefaultScenario(r.scenario) ? "" : " · custom numbers"}
           </option>
         ))}
       </select>
@@ -81,7 +82,7 @@ export function Evidence({
   }
   const rows = headlineRows(selected);
   const baseRows = compare ? headlineRows(compare) : null;
-  const comparable = compareRun !== null && compareRun.id !== selectedRun.id && compareRun.seed === selectedRun.seed && compareRun.paymentSlowdown === selectedRun.paymentSlowdown;
+  const comparable = compareRun !== null && compareRun.id !== selectedRun.id && compareRun.seed === selectedRun.seed && compareRun.paymentSlowdown === selectedRun.paymentSlowdown && sameNumbers(compareRun, selectedRun);
   const mismatch = compareRun !== null && compareRun.id !== selectedRun.id && !comparable;
 
   return (
@@ -92,7 +93,12 @@ export function Evidence({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        <Badge tone={selectedRun.paymentSlowdown === 20 ? "warn" : "ok"}>{selectedRun.paymentSlowdown === 20 ? "Payment 20× slower" : "Healthy"}</Badge>
+        <Badge tone={selectedRun.paymentSlowdown === 1 ? "ok" : "warn"}>{selectedRun.paymentSlowdown === 1 ? "Healthy" : `Payment ${selectedRun.paymentSlowdown}× slower`}</Badge>
+        {isDefaultScenario(selectedRun.scenario) ? null : (
+          <Badge tone="replay" title={describeNumbers(selectedRun.scenario)}>
+            Custom numbers
+          </Badge>
+        )}
         <Badge>seed {selectedRun.seed}</Badge>
         <Badge>{describeKnobs(selectedRun.knobs)}</Badge>
         <Badge tone={selectedRun.source === "agent" ? "accent" : "neutral"}>{selectedRun.source === "agent" ? "agent run" : "manual run"}</Badge>
@@ -100,7 +106,7 @@ export function Evidence({
 
       {mismatch ? (
         <p className="mt-3 rounded-md border border-warn/40 bg-warn/5 p-2 text-xs text-warn" role="status">
-          Not comparable: these runs differ in seed or fault, so no deltas are shown. Only knob values may differ between compared runs.
+          Not comparable: these runs differ in seed, fault or numbers, so no deltas are shown. Only knob values may differ between compared runs.
         </p>
       ) : null}
 
@@ -172,7 +178,11 @@ export function Evidence({
 
       <div className="mt-3 rounded-md border border-warn/40 bg-warn/5 p-2.5 text-xs">
         <p className="font-semibold text-warn">Scope</p>
-        <p className="mt-0.5">These numbers describe a template model with assumed capacities and service times, not your system. Measure real latency and capacity before using them to make a capacity decision.</p>
+        <p className="mt-0.5">
+          {isDefaultScenario(selectedRun.scenario)
+            ? "These numbers describe a template model with assumed capacities and service times, not your system. Measure real latency and capacity before using them to make a capacity decision."
+            : "These results hold for the numbers you entered, run on a simplified model of five services. The engine does not measure those numbers and this is not your real system. Measure real latency and capacity before using them to make a capacity decision."}
+        </p>
       </div>
       <p className="num mt-2 break-all text-[10px] text-muted">run hash {selected.runHash}</p>
     </Card>

@@ -1,0 +1,1010 @@
+[
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "bed2e12d",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c6f249da",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c290026c",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "9a1ddf36",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "52452d26",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "9480c030",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "f269b227",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "de509735",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "6effe38f",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "2faa7abb",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "069715fa",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "793dc7a6",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "0ff17241",
+    "offered": 500,
+    "errorRate": 0.94,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "2ea6c77b",
+    "offered": 500,
+    "errorRate": 0.912,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "fcbabbac",
+    "offered": 500,
+    "errorRate": 0.918,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "e8794b90",
+    "offered": 500,
+    "errorRate": 0.912,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "3021f194",
+    "offered": 500,
+    "errorRate": 0.16,
+    "degradedRate": 0.656
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "e564af5b",
+    "offered": 500,
+    "errorRate": 0.008,
+    "degradedRate": 0.808
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "a432c946",
+    "offered": 500,
+    "errorRate": 0.76,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "7428194b",
+    "offered": 500,
+    "errorRate": 0.52,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c73451a9",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "127bc425",
+    "offered": 500,
+    "errorRate": 0.464,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "b6d80d37",
+    "offered": 500,
+    "errorRate": 0.76,
+    "degradedRate": 0
+  },
+  {
+    "seed": 1,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "0041d72e",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "0718a29b",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "6e061d3c",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "372380aa",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c9ca9460",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "60846a62",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "20b9d0b8",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "0778addf",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "a23fe32b",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "54dcc083",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "8bb7ce99",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "54277efc",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "83d285d6",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "85f1abac",
+    "offered": 500,
+    "errorRate": 0.94,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "a889a41c",
+    "offered": 500,
+    "errorRate": 0.91,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "1eadc2da",
+    "offered": 500,
+    "errorRate": 0.908,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "7892ae12",
+    "offered": 500,
+    "errorRate": 0.908,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "4aa13a4e",
+    "offered": 500,
+    "errorRate": 0.162,
+    "degradedRate": 0.654
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "3478e7fc",
+    "offered": 500,
+    "errorRate": 0.01,
+    "degradedRate": 0.806
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "aeddad65",
+    "offered": 500,
+    "errorRate": 0.76,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "c3ffec7f",
+    "offered": 500,
+    "errorRate": 0.52,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "b0ae9644",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "0e3ead17",
+    "offered": 500,
+    "errorRate": 0.464,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "8a60c610",
+    "offered": 500,
+    "errorRate": 0.76,
+    "degradedRate": 0
+  },
+  {
+    "seed": 2,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "84b93ff1",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c7575f14",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "b72fa67b",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "ac70b269",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "bdf983df",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "dcec02f7",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "b4dd0dbd",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "623b309e",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "fe457388",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "22d09136",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "d0435e0e",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "31bd052b",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 1,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "c2eaa68b",
+    "offered": 500,
+    "errorRate": 0,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "1e654c9c",
+    "offered": 500,
+    "errorRate": 0.94,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 1,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "af45cbf2",
+    "offered": 500,
+    "errorRate": 0.914,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 3,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "6a10a024",
+    "offered": 500,
+    "errorRate": 0.912,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 5,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "a2c47ac6",
+    "offered": 500,
+    "errorRate": 0.906,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "12f33734",
+    "offered": 500,
+    "errorRate": 0.16,
+    "degradedRate": 0.656
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 2,
+      "circuitBreaker": true,
+      "bulkhead": null
+    },
+    "runHash": "8385c8b5",
+    "offered": 500,
+    "errorRate": 0.006,
+    "degradedRate": 0.81
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 5
+    },
+    "runHash": "03be9bee",
+    "offered": 500,
+    "errorRate": 0.758,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": 10
+    },
+    "runHash": "1ca9fdb3",
+    "offered": 500,
+    "errorRate": 0.518,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 300,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "5343c0ea",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 3000,
+      "retries": 0,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "156b461a",
+    "offered": 500,
+    "errorRate": 0.466,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 1000,
+      "retries": 0,
+      "circuitBreaker": true,
+      "bulkhead": 5
+    },
+    "runHash": "e7d33533",
+    "offered": 500,
+    "errorRate": 0.758,
+    "degradedRate": 0
+  },
+  {
+    "seed": 7,
+    "paymentSlowdown": 20,
+    "knobs": {
+      "timeoutMs": 200,
+      "retries": 2,
+      "circuitBreaker": false,
+      "bulkhead": null
+    },
+    "runHash": "356bf37f",
+    "offered": 500,
+    "errorRate": 1,
+    "degradedRate": 0
+  }
+]
