@@ -6,6 +6,7 @@ Built for the Meta Global AI Developer Hackathon: **Build for Your World**, Indi
 
 - **Demo video (3 min):** _TODO before submission: add the link_
 - **Hosted replay (no key, convenience only):** _TODO: add the link if published_
+- **Full documentation:** [docs/12-documentation.md](docs/12-documentation.md) (what it is, every feature, the simulator, the agent, the API, limits, troubleshooting).
 - **Run it locally:** three commands, below. No account, database or API key is required to see everything except the live agent.
 
 ## The problem
@@ -133,7 +134,7 @@ Development used Claude Code (Anthropic) as a coding assistant, working from the
 | `public/golden/` | the recorded agent session (served as a static file) |
 | `data/runs/` | transcripts of both agent-test trials |
 | `scripts/` | spike, agent test and golden-run builder |
-| `docs/` | specs 01 to 11 (08 demo script, 09 usage guide, 10 Your numbers, 11 Fill from incident text) and the decision log |
+| `docs/` | specs 01 to 12 (08 demo script, 09 usage guide, 10 Your numbers, 11 Fill from incident text, 12 full documentation) and the decision log |
 
 ## License
 
