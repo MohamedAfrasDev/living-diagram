@@ -1,6 +1,6 @@
 # Your Numbers (option B): spec
 
-Status: **proposed, not approved, no code written.** Decision: D-037.
+Status: **implemented on branch `your-numbers` (not merged, not pushed), 2026-10-30.** Decisions: D-037 (approved), D-038 (results). Gate results are in section 10.
 
 ## 1. Goal
 
@@ -93,3 +93,18 @@ Proposed schedule: Oct 30 engine and tests, tools, prompt, route; Oct 31 UI, bro
 - A custom scenario where the healthy system already fails or nothing helps: the agent must say so; the "confirmed fix" rule (D-017) is relative and may confirm nothing, which is an honest answer.
 - Time: this competes with the video and the tester check; hence the kill criteria.
 - Users reading entered numbers as predictions of their real system: the labels and the limits cover it, and the submission wording must too.
+
+## 10. Gate results (2026-10-30)
+
+| Gate | Result |
+|---|---|
+| G1 bit-exact default | Pass. All 72 recorded run hashes reproduce, with no scenario and with the default passed explicitly (the two pinned values `0ff17241` and `85f1abac` included); the recorded replay still re-runs all 20 calls; the 119 earlier tests pass unchanged |
+| G2 prompt | Pass. `buildSystemPrompt(DEFAULT_SCENARIO)` equals the saved prompt byte for byte, and the default tool definitions equal the saved definitions (the comparison normalises Windows line endings) |
+| G3 validation | Pass. Every bound is accepted at the edge and rejected just outside, with the field named; nothing is clamped |
+| G4 invariants | Pass on three custom scenarios across healthy, fault, retries, breaker and bulkhead runs, plus FIFO and an oversized run |
+| G5 behavior | Pass, as strict inequalities: more Payment workers and a milder fault each lower the fault-alone error rate; a lower request rate does not raise it and a higher one does not lower it. The first version used `<=` and would have passed on equal results; it was tightened after the browser check below |
+| G6 tools and route | Pass. `paymentSlowdown` is limited to 1 or the factor; a bad `scenario` body is a 400 `INVALID_SCENARIO` naming the field; `REPLAY_ONLY` still wins |
+| G7 browser | Pass in light, dark and at phone width, **after fixing a bug it found**: the UI result cache key omitted the scenario, so a run on custom numbers was shown the template's cached result (94.0% errors instead of 0.0%). Fixed by moving the cache to `lib/ui/results.ts` with the scenario in the key and tests in both orders |
+| G8 agent | Exploratory, reported in doc 07: 3 of 3 valid and confirmed, 0 unsupported numbers |
+
+What was not done: no automated browser test; the live agent was run on one custom scenario only; the 8 of 12 evaluation was not repeated on custom numbers; the hosted replay copy does not expose Your numbers' live agent (unchanged).

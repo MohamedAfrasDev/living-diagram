@@ -49,11 +49,11 @@ Cut order if behind: evidence export, second scenario, extra testers, panel poli
 
 ## Phase 5: Your numbers (option B, proposed D-037; build only after approval)
 
-- [ ] T23: Save the default-prompt fixture and the default run hashes; write the failing tests for gates G1 to G6
-- [ ] T24: Engine: `Scenario`, `DEFAULT_SCENARIO`, validation, simulate reads it; default hashes unchanged (G1, G3, G4, G5)
-- [ ] T25: Tools, contracts, `buildSystemPrompt`, route (`scenario` in the body) (G2, G6)
-- [ ] T26: UI: Your numbers card, per-run scenario snapshot, canvas and evidence read the run's scenario, comparison rule
-- [ ] T27: Browser checks light, dark and phone (G7); three live agent runs on a custom scenario, reported as exploratory (G8)
-- [ ] T28: Docs and wording: README limits, docs 04, 05, 06, 09, demo script; PR
+- [x] T23: Fixtures (72 default run hashes, default prompt, default tool definitions) and failing tests for G1 to G6: done
+- [x] T24: Engine reads a Scenario; default results bit-exact; G1, G3, G4, G5: done
+- [x] T25: Tools, contracts, prompt builder, route accept a scenario; G2, G6: done
+- [x] T26: UI: Your numbers card, per-run scenario, canvas and evidence read the run's numbers, comparison rule: done
+- [x] T27: Browser checks (light, dark, phone) found and fixed a result-cache bug (D-038); 3 live agent runs on custom numbers, exploratory: done
+- [x] T28: Docs and wording (README, docs 06, 07, 08, 09, 10, decision log): done. Branch `your-numbers` is local only: not pushed, no PR
 
 Kill criteria: G1 not green by end of Oct 30 means option A; UI not done by end of Oct 31 means engine and manual panel only, or revert.

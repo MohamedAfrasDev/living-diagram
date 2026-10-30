@@ -40,7 +40,7 @@ cp .env.example .env.local
 # edit .env.local and set MODEL_API_KEY=<your Meta Model API key>
 ```
 
-The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (119 tests), `npm run build`, `npm run lint`. Every way to use it, with what to expect, is in [docs/09-usage.md](docs/09-usage.md).
+The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (203 tests), `npm run build`, `npm run lint`. Every way to use it, with what to expect, is in [docs/09-usage.md](docs/09-usage.md).
 
 ## What you will see
 
@@ -48,6 +48,7 @@ The key is read only by the server route and never reaches the browser. A hosted
 2. **Agent investigation:** every tool call and result, blocked statements shown as blocked, then the conclusion with its limits. "Replay recorded run" steps through a real session.
 3. **Evidence:** any two runs under matched seed and fault, with error rate and degraded rate side by side, per-node detail, and the run hash.
 4. **Run it by hand:** the four knobs (`timeoutMs`, `retries`, `circuitBreaker`, `bulkhead`) on the same engine, no agent needed.
+5. **Your numbers:** enter your own workers, queue sizes and times for the five services, the request rate, the cache miss rate and how much slower Payment gets. Manual runs and the live agent then use those numbers; runs on different numbers are never compared. The recorded Replay stays on the template numbers.
 
 What the engine shows for the default scenario (seed 1, 500 requests at 50 per second, template parameters):
 
@@ -94,10 +95,11 @@ Everything below is in `docs/` with transcripts in `data/runs/`.
 
 | Check | Result |
 |---|---|
-| Unit and integration tests | 119 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers, the replay-only guard |
+| Unit and integration tests | 203 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers, the replay-only guard, and the Your numbers gates (default results bit-exact against 72 recorded hashes) |
 | Tool-calling spike (10 runs) | **9 of 10** after correcting my scorer. The first scorer gave 6 of 10 because it rejected the model's own tool arguments, and one run hit a provider error (D-023) |
 | Agent test, trial 1 (6 live runs) | valid calls 6/6, **confirmed fix 3/6 (bar was 4: missed)**, unsupported numbers 0 |
 | Agent test, trial 2 | after one sentence in the system prompt defining the default settings: valid 6/6, **confirmed fix 5/6**, unsupported numbers 0. Trial 1 stays on record; the prompt change was made after seeing it (D-027, D-028) |
+| Custom numbers, 3 live runs (exploratory) | one custom scenario (Payment 12 workers, a request every 15 ms, 40 percent cache misses, 10x fault): valid calls 3/3, confirmed fix 3/3 (all the circuit breaker), unsupported numbers 0, healthy baseline 0.0% errors. Three runs, no bar; **the 8 of 12 above applies to the template numbers only** (D-038) |
 
 Honest notes:
 
@@ -107,11 +109,11 @@ Honest notes:
 
 ## Known limits
 
-- It models one template system: five nodes, four knobs, one fault. Every capacity and service time is an assumption, not a measurement. Results describe the model, not your system; measure before making a capacity decision.
+- It models one fixed chain of five services (Gateway, Order, Cache, Payment, DB) with four settings and one fault. You can enter your own workers, queue sizes, times per request, request rate, cache miss rate and fault factor ("Your numbers"), but **not your own architecture**: you cannot add, remove or rewire services. The numbers are inputs, not measurements, so results describe those numbers on this simplified model, not your system; measure before making a capacity decision.
 - Virtual time only. No claim about real-world latency, throughput or cost.
 - A fix is "confirmed" by the rule in `docs/decision-log.md` (D-017): under the fault on two seeds, error rate at most half of the fault alone, degraded share reported, healthy system undegraded. Other definitions would give other answers.
 - The recorded replay was captured with the system prompt from before the baseline sentence was added; the agent's behavior for that question is the same in trial 2.
-- Out of scope on purpose: accounts, a database, image import, other fault types, hosting a live agent with a shared key.
+- Out of scope on purpose: drawing your own architecture, accounts, a database, image import, other fault types, hosting a live agent with a shared key.
 
 ## Built during the hackathon
 
@@ -131,7 +133,7 @@ Development used Claude Code (Anthropic) as a coding assistant, working from the
 | `public/golden/` | the recorded agent session (served as a static file) |
 | `data/runs/` | transcripts of both agent-test trials |
 | `scripts/` | spike, agent test and golden-run builder |
-| `docs/` | specs 01 to 09 (08 is the demo script, 09 the usage guide) and the decision log |
+| `docs/` | specs 01 to 10 (08 demo script, 09 usage guide, 10 Your numbers) and the decision log |
 
 ## License
 

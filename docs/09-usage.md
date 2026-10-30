@@ -1,6 +1,6 @@
 # Usage Guide
 
-Every way to use LivingDiagrams, from a first run to re-recording the replay. The numbers in section 4 were produced by running the engine on 2026-10-29 with seed 1 (500 requests at 50 per second, template parameters). The tests pin the relationships in D-017, not these exact values, so if the engine or the scenario changes, re-run them.
+Every way to use LivingDiagrams, from a first run to re-recording the replay. The numbers in section 4 were produced by running the engine on 2026-10-29 with seed 1 (500 requests at 50 per second, the template numbers). The tests pin the relationships in D-017, not these exact values, so if the engine or the scenario changes, re-run them.
 
 ## 0. Start it
 
@@ -39,7 +39,7 @@ In the Evidence pane use **Run** and **Compare with**. You get both values and t
 
 In **Run it by hand** set the knobs, tick or untick the fault, pick a seed, and press **Run simulation**. Invalid values disable the button and say why. Each run appears as `manual-1`, `manual-2` and so on. When a baseline run with the same seed and fault already exists in the list, the new run is compared with it automatically.
 
-What the engine gives for each setting:
+What the engine gives for each setting (template numbers):
 
 | Experiment | Errors | Degraded | Payment attempts per request | p95 |
 |---|---|---|---|---|
@@ -64,6 +64,18 @@ What it teaches:
 - **Observed behavior:** breaker plus bulkhead 5 behaves like bulkhead 5 alone (76.0%), because the breaker counts failed Payment attempts and the bulkhead rejects before an attempt exists, so the breaker never opens.
 
 Use the same seed to compare. A different seed only changes which requests miss the cache.
+
+## 4b. Your numbers: use your own capacities and timings
+
+The **Your numbers** card (under the System pane, collapsed, marked Template or Custom) lets you enter your own numbers for the same five services: workers, queue size and milliseconds per request for each, a request every N ms (5 to 100 requests per second), the cache miss percent, and how many times slower Payment is when the fault is on (2 to 50).
+
+- Bounds are 1 to 500 workers, 0 to 500 queue, 1 to 2,000 ms. An out-of-range or blank entry is an error that states the bounds; nothing is corrected silently, and "Run simulation" and "Ask the agent" stay disabled, with the reason shown, until the numbers are valid.
+- Manual runs use the current numbers and carry a "Custom numbers" chip. The canvas gauges and the evidence panel use the numbers each run was made on. Changing the card never rewrites existing runs.
+- Runs on different numbers are **not comparable**: the comparison shows that and no deltas.
+- **Ask the agent** sends your numbers; the agent is told they are your inputs, not measurements, and to say so when the healthy system already fails. It can still change only the four settings.
+- The recorded Replay always uses the template numbers. **Reset to template** restores them.
+- Example (seed 1, fault on): doubling Payment's workers from 10 to 20 takes the error rate from 94.0% to 0.0%, with every request succeeding (p95 648 ms).
+- These are numbers you entered on a simplified model. They are not measurements, and you still cannot add or rewire services.
 
 ## 5. Ask the live agent (needs a key)
 
@@ -121,4 +133,4 @@ Follow `docs/08-demo-script.md` (record from a production build so the Next.js d
 
 ## 10. What it will not do
 
-It models one template system with one fault, so it cannot analyze your own architecture or predict real capacity. There are no accounts, no database, no image import and no other faults. A hosted copy never runs the live agent.
+It models one fixed chain of five services with one fault. You can enter your own numbers for those services, but it cannot analyze your own architecture (you cannot add, remove or rewire services) or predict real capacity. There are no accounts, no database, no image import and no other faults. A hosted copy never runs the live agent.

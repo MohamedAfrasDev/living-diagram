@@ -47,7 +47,7 @@ The full script, with the voiceover, on-screen requirements and what not to say,
 
 ## 7. Out of scope here
 
-Project home, saved projects, authoring, onboarding, settings, charts beyond the metric table, hosting.
+Project home, saved projects, drawing your own architecture, onboarding, settings, charts beyond the metric table, hosting. (Entering your own numbers for the fixed five services is in scope: section 11.)
 
 ## 8. Implementation notes (T15 to T17)
 
@@ -87,3 +87,7 @@ Built in `app/_components/` (`Workspace`, `Canvas`, `Playback`, `Timeline`, `Evi
 - Rollback: delete the Vercel project; no data is stored anywhere.
 
 **Estimate:** about 30 to 40 minutes including verification.
+
+## 11. Your numbers (D-037, built 2026-10-30)
+
+See `docs/10-your-numbers.md`. The card is `app/_components/NumbersCard.tsx`; the draft and validation helpers are `lib/ui/numbers.ts`; results are cached in `lib/ui/results.ts` with the scenario in the key. Each run carries its own scenario; the canvas, the per-node table and the evidence panel read the run's numbers; the Scope card says "numbers you entered" for custom runs; runs on different numbers are not comparable; the Replay stays on the template numbers. Checked in a browser in light, dark and at phone width: editing a number, a manual run, the comparison rule, the invalid state (badge, bounds message, disabled buttons, visible reason) and the reset. The browser check found a real bug (the result cache ignored the scenario and showed the template's result for a custom run), now fixed and tested (D-038).

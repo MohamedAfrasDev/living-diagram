@@ -1,0 +1,32 @@
+{
+  "nodes": {
+    "gateway": {
+      "concurrency": 100,
+      "queueCapacity": 100,
+      "localMs": 2
+    },
+    "order": {
+      "concurrency": 80,
+      "queueCapacity": 40,
+      "localMs": 5
+    },
+    "cache": {
+      "concurrency": 50,
+      "queueCapacity": 0,
+      "localMs": 1
+    },
+    "payment": {
+      "concurrency": 12,
+      "queueCapacity": 30,
+      "localMs": 25
+    },
+    "db": {
+      "concurrency": 20,
+      "queueCapacity": 40,
+      "localMs": 10
+    }
+  },
+  "arrivalIntervalMs": 15,
+  "cacheMissRate": 0.4,
+  "faultFactor": 10
+}
