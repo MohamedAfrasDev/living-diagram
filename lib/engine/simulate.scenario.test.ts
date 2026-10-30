@@ -86,8 +86,8 @@ describe("paymentSlowdown must be 1 or the scenario's fault factor", () => {
 });
 
 describe("G5: behavior moves the way the numbers say", () => {
-  test("more Payment workers never raise the fault-alone error rate", () => {
-    expect(run(bigPayment).errorRate).toBeLessThanOrEqual(run(DEFAULT_SCENARIO).errorRate);
+  test("more Payment workers strictly lower the fault-alone error rate", () => {
+    expect(run(bigPayment).errorRate).toBeLessThan(run(DEFAULT_SCENARIO).errorRate);
   });
 
   test("a lower request rate never raises it, a higher one never lowers it", () => {
@@ -96,8 +96,8 @@ describe("G5: behavior moves the way the numbers say", () => {
     expect(run(highLoad).errorRate).toBeGreaterThanOrEqual(base);
   });
 
-  test("a milder fault never raises it", () => {
-    expect(run(mildFault).errorRate).toBeLessThanOrEqual(run(DEFAULT_SCENARIO).errorRate);
+  test("a milder fault strictly lowers it", () => {
+    expect(run(mildFault).errorRate).toBeLessThan(run(DEFAULT_SCENARIO).errorRate);
   });
 
   test("a healthy run is the same whatever the fault factor is", () => {

@@ -5,8 +5,9 @@ import type { InvestigationStatus, TranscriptEntry } from "@/lib/agent/loop";
 import { verifyGolden, type VerifyResult } from "@/lib/agent/replay";
 import { DEFAULT_SCENARIO, HORIZON_MS, isDefaultScenario, type Scenario } from "@/lib/engine/scenario";
 import { isReplayOnly, liveAgentDisabledReason } from "@/lib/hosting";
-import { simulate, type Knobs, type SimulationResult } from "@/lib/engine/simulate";
-import { DEFAULT_KNOBS, extractRuns, runInput, sameNumbers, sampleAt, type UiRun } from "@/lib/ui/runs";
+import type { Knobs } from "@/lib/engine/simulate";
+import { resultFor } from "@/lib/ui/results";
+import { DEFAULT_KNOBS, extractRuns, sameNumbers, sampleAt, type UiRun } from "@/lib/ui/runs";
 import { Canvas, NodeTable } from "./Canvas";
 import { Evidence } from "./Evidence";
 import { NumbersCard } from "./NumbersCard";
@@ -24,19 +25,6 @@ const REPLAY_STEP_MS = 450;
 // Inlined at build time. On a hosted copy the live agent is off and says why.
 const LIVE_DISABLED_REASON = liveAgentDisabledReason(isReplayOnly(process.env.NEXT_PUBLIC_REPLAY_ONLY));
 const VIRTUAL_MS_PER_SECOND = 3000;
-
-// Pure and deterministic, so results are cached by their inputs.
-const resultCache = new Map<string, SimulationResult>();
-function resultFor(run: UiRun): SimulationResult {
-  const input = runInput(run, true);
-  const key = JSON.stringify([input.seed, input.knobs, input.paymentSlowdown]);
-  let hit = resultCache.get(key);
-  if (!hit) {
-    hit = simulate(input);
-    resultCache.set(key, hit);
-  }
-  return hit;
-}
 
 const isDefaultKnobs = (k: Knobs) => JSON.stringify(k) === JSON.stringify(DEFAULT_KNOBS);
 
