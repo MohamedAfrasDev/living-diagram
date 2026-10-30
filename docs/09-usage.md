@@ -77,6 +77,15 @@ The **Your numbers** card (under the System pane, collapsed, marked Template or 
 - Example (seed 1, fault on): doubling Payment's workers from 10 to 20 takes the error rate from 94.0% to 0.0%, with every request succeeding (p95 648 ms).
 - These are numbers you entered on a simplified model. They are not measurements, and you still cannot add or rewire services.
 
+### 4c. Fill from incident text (needs a key)
+
+Inside **Your numbers**, **Fill from incident text** opens a box for up to 6,000 characters of pasted text (a postmortem paragraph, a chat thread, a config snippet). **Read numbers** sends it to Muse Spark, which only reads: it proposes values for the fields the text states, and each comes with the exact sentence it was read from.
+
+- Nothing is applied yet. A review table shows each value with its quote and a state: found, converted (for example 66 requests per second becomes a request every 15 ms), conflict (the text gives two values, none is used) or rejected (outside the simulator's bounds, never clamped). Fields the text does not state keep the template numbers.
+- A value only shows if its quote is really in your text and the number is really in the quote; the app checks that in code, not the model.
+- **Use these numbers** copies the values into the form above, where the normal validation and the Custom badge apply, and you can still edit them. **Close and discard** throws everything away. The text is not stored by this app. Do not paste secrets or customer data: it goes to Meta's model.
+- The model may be cautious and leave a field out; it may also place a number under the wrong service, so check every row. You map your services onto the five yourself. Without a key, or on the hosted replay copy, the button is off with the reason shown.
+
 ## 5. Ask the live agent (needs a key)
 
 1. Type a question (up to 500 characters) and press **Ask the agent**. The badge switches to **Live agent** and the Replay banner disappears. A run takes roughly 30 to 90 seconds. **Cancel** stops it.

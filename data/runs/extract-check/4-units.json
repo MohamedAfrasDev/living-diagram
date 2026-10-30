@@ -1,0 +1,81 @@
+{
+  "status": 200,
+  "body": {
+    "kind": "extraction",
+    "result": {
+      "fields": {
+        "gateway.concurrency": {
+          "state": "not_found"
+        },
+        "gateway.queueCapacity": {
+          "state": "not_found"
+        },
+        "gateway.localMs": {
+          "state": "not_found"
+        },
+        "order.concurrency": {
+          "state": "not_found"
+        },
+        "order.queueCapacity": {
+          "state": "not_found"
+        },
+        "order.localMs": {
+          "state": "not_found"
+        },
+        "cache.concurrency": {
+          "state": "not_found"
+        },
+        "cache.queueCapacity": {
+          "state": "not_found"
+        },
+        "cache.localMs": {
+          "state": "not_found"
+        },
+        "payment.concurrency": {
+          "state": "not_found"
+        },
+        "payment.queueCapacity": {
+          "state": "not_found"
+        },
+        "payment.localMs": {
+          "state": "converted",
+          "value": 40,
+          "quote": "Payment calls normally take 0.04 s each.",
+          "raw": {
+            "value": 0.04,
+            "unit": "s"
+          }
+        },
+        "db.concurrency": {
+          "state": "not_found"
+        },
+        "db.queueCapacity": {
+          "state": "not_found"
+        },
+        "db.localMs": {
+          "state": "not_found"
+        },
+        "arrivalIntervalMs": {
+          "state": "found",
+          "value": 25,
+          "quote": "We receive a request every 25 ms."
+        },
+        "cacheMissRate": {
+          "state": "converted",
+          "value": 0.15,
+          "quote": "The cache miss rate was 15%.",
+          "raw": {
+            "value": 15,
+            "unit": "percent"
+          }
+        },
+        "faultFactor": {
+          "state": "found",
+          "value": 5,
+          "quote": "Under the fault payment was 5 times slower."
+        }
+      },
+      "unmapped": []
+    }
+  }
+}

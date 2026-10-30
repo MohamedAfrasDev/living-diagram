@@ -47,6 +47,8 @@ Only with a key, on the local machine, not on a hosted copy. Click **Ask the age
 
 The script is built from the recorded run on the template numbers and already runs close to 3:00, so this is optional and would replace the live clip, not add to the length. If you use it, show it in about 15 seconds: open **Your numbers**, change Payment workers from 10 to 20, press **Run simulation**, and say what the screen shows (errors drop from 94.0% to 0.0% on those numbers). Say "numbers I entered", never "your system": it models a fixed five-service chain, you cannot add or rewire services.
 
+Likewise optional, only with a key and only if there are seconds to spare: **Fill from incident text** (paste two sentences, press **Read numbers**, show the quotes, press **Use these numbers**). Say "it reads the numbers out of text, with the sentence each came from, and I check them", never "it understands your incident".
+
 ## What not to say
 
 - Not that it "models your system" or lets you "draw your architecture": you can enter your own numbers for five fixed services, nothing more.

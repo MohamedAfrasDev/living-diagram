@@ -40,7 +40,7 @@ cp .env.example .env.local
 # edit .env.local and set MODEL_API_KEY=<your Meta Model API key>
 ```
 
-The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (203 tests), `npm run build`, `npm run lint`. Every way to use it, with what to expect, is in [docs/09-usage.md](docs/09-usage.md).
+The key is read only by the server route and never reaches the browser. A hosted replay copy sets `REPLAY_ONLY=1` and `NEXT_PUBLIC_REPLAY_ONLY=1` and no key: the route then refuses every request even if a key were present, and the interface disables "Ask the agent" and says why. Other commands: `npm test` (243 tests), `npm run build`, `npm run lint`. Every way to use it, with what to expect, is in [docs/09-usage.md](docs/09-usage.md).
 
 ## What you will see
 
@@ -48,7 +48,7 @@ The key is read only by the server route and never reaches the browser. A hosted
 2. **Agent investigation:** every tool call and result, blocked statements shown as blocked, then the conclusion with its limits. "Replay recorded run" steps through a real session.
 3. **Evidence:** any two runs under matched seed and fault, with error rate and degraded rate side by side, per-node detail, and the run hash.
 4. **Run it by hand:** the four knobs (`timeoutMs`, `retries`, `circuitBreaker`, `bulkhead`) on the same engine, no agent needed.
-5. **Your numbers:** enter your own workers, queue sizes and times for the five services, the request rate, the cache miss rate and how much slower Payment gets. Manual runs and the live agent then use those numbers; runs on different numbers are never compared. The recorded Replay stays on the template numbers.
+5. **Your numbers:** enter your own workers, queue sizes and times for the five services, the request rate, the cache miss rate and how much slower Payment gets. Manual runs and the live agent then use those numbers; runs on different numbers are never compared. The recorded Replay stays on the template numbers. With a key, **Fill from incident text** lets Muse Spark read these numbers out of pasted text, each with its source quote, for you to check and apply; it only reads, it does not analyze your incident.
 
 What the engine shows for the default scenario (seed 1, 500 requests at 50 per second, template parameters):
 
@@ -95,7 +95,7 @@ Everything below is in `docs/` with transcripts in `data/runs/`.
 
 | Check | Result |
 |---|---|
-| Unit and integration tests | 203 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers, the replay-only guard, and the Your numbers gates (default results bit-exact against 72 recorded hashes) |
+| Unit and integration tests | 243 passing: engine golden and invariant tests, tool layer, claim checker, loop with a scripted provider, replay verifier, UI helpers, the replay-only guard, the Your numbers gates (default results bit-exact against 72 recorded hashes) and the incident-text extraction checks (quotes, units, bounds, conflicts, route guards) |
 | Tool-calling spike (10 runs) | **9 of 10** after correcting my scorer. The first scorer gave 6 of 10 because it rejected the model's own tool arguments, and one run hit a provider error (D-023) |
 | Agent test, trial 1 (6 live runs) | valid calls 6/6, **confirmed fix 3/6 (bar was 4: missed)**, unsupported numbers 0 |
 | Agent test, trial 2 | after one sentence in the system prompt defining the default settings: valid 6/6, **confirmed fix 5/6**, unsupported numbers 0. Trial 1 stays on record; the prompt change was made after seeing it (D-027, D-028) |
@@ -133,7 +133,7 @@ Development used Claude Code (Anthropic) as a coding assistant, working from the
 | `public/golden/` | the recorded agent session (served as a static file) |
 | `data/runs/` | transcripts of both agent-test trials |
 | `scripts/` | spike, agent test and golden-run builder |
-| `docs/` | specs 01 to 10 (08 demo script, 09 usage guide, 10 Your numbers) and the decision log |
+| `docs/` | specs 01 to 11 (08 demo script, 09 usage guide, 10 Your numbers, 11 Fill from incident text) and the decision log |
 
 ## License
 

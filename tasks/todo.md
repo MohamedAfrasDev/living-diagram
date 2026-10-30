@@ -58,13 +58,13 @@ Cut order if behind: evidence export, second scenario, extra testers, panel poli
 
 Kill criteria: G1 not green by end of Oct 30 means option A; UI not done by end of Oct 31 means engine and manual panel only, or revert.
 
-## Phase 6: Fill from incident text (D-039, proposed; build only after approval)
+## Phase 6: Fill from incident text (D-039 approved, built, D-040)
 
 Spec: `docs/11-incident-text.md`. Hard stop: end of Oct 31. Must not delay the video, tester check or hosted deploy.
 
-- [ ] T29: Fixtures and failing tests for E1 to E6 (scripted provider; quote check, conversions, validation, conflict/absence, route guards)
-- [ ] T30: Extraction module and `POST /api/extract`
-- [ ] T31: Review table UI inside Your numbers; browser checks (E7)
-- [ ] T32: 8-text extraction check written before running (E8); docs and wording
+- [x] T29: Fixtures and failing tests for E1 to E6 (scripted provider; quote check, conversions, validation, conflict/absence, route guards)
+- [x] T30: Extraction module and `POST /api/extract`
+- [x] T31: Review table UI inside Your numbers; browser checks (E7)
+- [x] T32: 8-text extraction check written before running (E8); docs and wording
 
 Kill criteria: E1 to E6 not green by end of Oct 30 means drop the feature; UI not done by end of Oct 31 means do not merge.

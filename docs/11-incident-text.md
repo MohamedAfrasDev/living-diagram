@@ -1,6 +1,6 @@
 # Fill from incident text ("real-incident mode"): spec
 
-Status: **proposed, not approved, no code written (2026-10-30).** Decision: D-039. Builds on `docs/10-your-numbers.md` (merged or not, it needs the `Scenario` type from branch `your-numbers`).
+Status: **approved and built on branch `your-numbers` (not merged, not pushed), 2026-10-30; gate results in section 9.** Decision: D-039. Builds on `docs/10-your-numbers.md` (merged or not, it needs the `Scenario` type from branch `your-numbers`).
 
 ## 1. Goal
 
@@ -91,3 +91,20 @@ Schedule: Oct 30 (rest of day) tests, extraction module, route; Oct 31 UI, brows
 - **Prompt injection through pasted text.** The tool has no side effects and the output is bounds-checked and confirmed; E8 includes a hostile text.
 - **Privacy.** Users may paste sensitive text. The box warns, the app stores nothing, and the key and text never go to any other host.
 - **Over-claiming.** A judge may read this as "it understands your incident". The wording in section 5 and the README limits must say it only reads numbers.
+
+## 9. Gate results (2026-10-30)
+
+| Gate | Result |
+|---|---|
+| E1 untouched engine | Pass. No file in `lib/engine/` changed; all 72 recorded hashes, the pinned hashes, the prompt fixture and the 20-call replay still pass (full suite 243 tests) |
+| E2 quote check | Pass (`lib/agent/extract.test.ts`): a fabricated quote, a value not in its quote, an empty quote, and an invented quote on a hostile text are all demoted to not found; case, whitespace and number words are tolerated |
+| E3 conversion | Pass: seconds, rps, percent; unknown or mismatched units, a rate outside 10 to 200 ms, a fractional ms and a percent off the 0.01 step are rejected, not clamped |
+| E4 validation | Pass: out-of-bounds values are rejected with the field named; a full valid set builds a scenario `validateScenario` accepts; the template is not mutated |
+| E5 conflict and absence | Pass: conflict applies nothing; the same value stated twice is not a conflict; every field has a result; an all-null reply is valid |
+| E6 route | Pass (`app/api/extract/route.test.ts`): `REPLAY_ONLY` wins, `NO_API_KEY`, body limits (0 and 6,001 rejected, 6,000 allowed), one request at a time (shared lock with `/api/agent`), text-only reply re-prompted once then `EXTRACTION_FAILED`, a provider error never leaks details. Deviation from the draft: `REPLAY_ONLY` answers 503, as the agent route does, not 409 |
+| E7 browser | Pass on a production build: paste, read, review table with quotes, nothing applied until **Use these numbers**, then the 7 values appear in the form with the Custom badge; closing discards; dark theme, phone width (no horizontal scroll) and light theme checked. The review table was screenshot-checked on desktop only |
+| E8 extraction check | Bar met (0 wrong values shown as found), with one miss; see doc 07. A smoke check on 8 texts, not an accuracy |
+
+What was not done: no automated browser test; one live run per text; texts written by the feature's author, not from real incidents; images, files and multi-service mapping are not supported (section 6).
+
+Changes beyond the draft: `lib/busy.ts` (the shared lock), a `ProviderTool` type in `lib/agent/provider.ts` so a route can offer its own single tool, and `applyToDraft` in `lib/ui/numbers.ts`.

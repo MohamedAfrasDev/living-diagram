@@ -1,0 +1,77 @@
+{
+  "status": 200,
+  "body": {
+    "kind": "extraction",
+    "result": {
+      "fields": {
+        "gateway.concurrency": {
+          "state": "not_found"
+        },
+        "gateway.queueCapacity": {
+          "state": "not_found"
+        },
+        "gateway.localMs": {
+          "state": "not_found"
+        },
+        "order.concurrency": {
+          "state": "not_found"
+        },
+        "order.queueCapacity": {
+          "state": "not_found"
+        },
+        "order.localMs": {
+          "state": "not_found"
+        },
+        "cache.concurrency": {
+          "state": "not_found"
+        },
+        "cache.queueCapacity": {
+          "state": "not_found"
+        },
+        "cache.localMs": {
+          "state": "not_found"
+        },
+        "payment.concurrency": {
+          "state": "conflict",
+          "candidates": [
+            {
+              "value": 10,
+              "quote": "payment has 10 workers"
+            },
+            {
+              "value": 16,
+              "quote": "payment has 16 workers"
+            }
+          ]
+        },
+        "payment.queueCapacity": {
+          "state": "not_found"
+        },
+        "payment.localMs": {
+          "state": "found",
+          "value": 20,
+          "quote": "Payment calls take 20 ms"
+        },
+        "db.concurrency": {
+          "state": "not_found"
+        },
+        "db.queueCapacity": {
+          "state": "not_found"
+        },
+        "db.localMs": {
+          "state": "not_found"
+        },
+        "arrivalIntervalMs": {
+          "state": "not_found"
+        },
+        "cacheMissRate": {
+          "state": "not_found"
+        },
+        "faultFactor": {
+          "state": "not_found"
+        }
+      },
+      "unmapped": []
+    }
+  }
+}

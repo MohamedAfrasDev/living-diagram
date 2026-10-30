@@ -1,0 +1,87 @@
+{
+  "status": 200,
+  "body": {
+    "kind": "extraction",
+    "result": {
+      "fields": {
+        "gateway.concurrency": {
+          "state": "found",
+          "value": 200,
+          "quote": "- gateway: 200 workers, queue 150, 3 ms per request"
+        },
+        "gateway.queueCapacity": {
+          "state": "found",
+          "value": 150,
+          "quote": "- gateway: 200 workers, queue 150, 3 ms per request"
+        },
+        "gateway.localMs": {
+          "state": "found",
+          "value": 3,
+          "quote": "- gateway: 200 workers, queue 150, 3 ms per request"
+        },
+        "order.concurrency": {
+          "state": "not_found"
+        },
+        "order.queueCapacity": {
+          "state": "not_found"
+        },
+        "order.localMs": {
+          "state": "not_found"
+        },
+        "cache.concurrency": {
+          "state": "not_found"
+        },
+        "cache.queueCapacity": {
+          "state": "not_found"
+        },
+        "cache.localMs": {
+          "state": "not_found"
+        },
+        "payment.concurrency": {
+          "state": "found",
+          "value": 8,
+          "quote": "- payment: 8 workers, queue 10, 30 ms per request"
+        },
+        "payment.queueCapacity": {
+          "state": "found",
+          "value": 10,
+          "quote": "- payment: 8 workers, queue 10, 30 ms per request"
+        },
+        "payment.localMs": {
+          "state": "found",
+          "value": 30,
+          "quote": "- payment: 8 workers, queue 10, 30 ms per request"
+        },
+        "db.concurrency": {
+          "state": "found",
+          "value": 25,
+          "quote": "- db: 25 workers, queue 60, 12 ms per request"
+        },
+        "db.queueCapacity": {
+          "state": "found",
+          "value": 60,
+          "quote": "- db: 25 workers, queue 60, 12 ms per request"
+        },
+        "db.localMs": {
+          "state": "found",
+          "value": 12,
+          "quote": "- db: 25 workers, queue 60, 12 ms per request"
+        },
+        "arrivalIntervalMs": {
+          "state": "found",
+          "value": 25,
+          "quote": "one request every 25 ms"
+        },
+        "cacheMissRate": {
+          "state": "not_found"
+        },
+        "faultFactor": {
+          "state": "found",
+          "value": 15,
+          "quote": "payment degraded to 15 times its usual latency"
+        }
+      },
+      "unmapped": []
+    }
+  }
+}

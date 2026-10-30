@@ -1,0 +1,87 @@
+{
+  "status": 200,
+  "body": {
+    "kind": "extraction",
+    "result": {
+      "fields": {
+        "gateway.concurrency": {
+          "state": "not_found"
+        },
+        "gateway.queueCapacity": {
+          "state": "not_found"
+        },
+        "gateway.localMs": {
+          "state": "not_found"
+        },
+        "order.concurrency": {
+          "state": "found",
+          "value": 80,
+          "quote": "The order service runs 80 workers"
+        },
+        "order.queueCapacity": {
+          "state": "not_found"
+        },
+        "order.localMs": {
+          "state": "not_found"
+        },
+        "cache.concurrency": {
+          "state": "not_found"
+        },
+        "cache.queueCapacity": {
+          "state": "not_found"
+        },
+        "cache.localMs": {
+          "state": "not_found"
+        },
+        "payment.concurrency": {
+          "state": "found",
+          "value": 12,
+          "quote": "a pool of 12 workers"
+        },
+        "payment.queueCapacity": {
+          "state": "found",
+          "value": 30,
+          "quote": "a waiting queue of 30"
+        },
+        "payment.localMs": {
+          "state": "found",
+          "value": 25,
+          "quote": "Each payment call takes 25 ms"
+        },
+        "db.concurrency": {
+          "state": "not_found"
+        },
+        "db.queueCapacity": {
+          "state": "not_found"
+        },
+        "db.localMs": {
+          "state": "not_found"
+        },
+        "arrivalIntervalMs": {
+          "state": "converted",
+          "value": 15,
+          "quote": "Traffic was a steady 66 requests per second",
+          "raw": {
+            "value": 66,
+            "unit": "rps"
+          }
+        },
+        "cacheMissRate": {
+          "state": "converted",
+          "value": 0.4,
+          "quote": "About 40 percent of requests missed the cache",
+          "raw": {
+            "value": 40,
+            "unit": "percent"
+          }
+        },
+        "faultFactor": {
+          "state": "found",
+          "value": 10,
+          "quote": "was roughly 10 times slower than normal"
+        }
+      },
+      "unmapped": []
+    }
+  }
+}
